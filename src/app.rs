@@ -1,8 +1,15 @@
+use egui::Id;
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)]
 pub struct YTApp {
     name: String,
     age: u32,
+
+    //Kar se ne rabi shraniti
+    #[serde(skip)]
+    open: bool,
+    #[serde(skip)]
+    IDjiZaNapakaWindow: Vec<u16>,
 }
 
 impl Default for YTApp {
@@ -10,6 +17,8 @@ impl Default for YTApp {
         Self {
             name: "Arthur".to_owned(),
             age: 42,
+            open: false,
+            IDjiZaNapakaWindow: Vec::from([26252, 18405, 12010, 43838])
         }
     }
 }
@@ -27,11 +36,13 @@ impl YTApp {
             return eframe::get_value(storage, eframe::APP_KEY).unwrap_or_default();
         }
 
-        Default::default()
+        Default::default()        
     }
 }
 
 impl eframe::App for YTApp {
+
+
 
     /// Called by the frame work to save state before shutdown.
     fn save(&mut self, storage: &mut dyn eframe::Storage) {
@@ -51,10 +62,25 @@ impl eframe::App for YTApp {
                 self.age += 1;
             }
             ui.label(format!("Hello '{}', age {}", self.name, self.age));
+
+            egui::Window::new("Napaka").open(&mut self.open).show(ctx, |ui| {
+                ui.label("Hello World!");
+            });
+
+            IzpisiNapako(self, ctx, self.IDjiZaNapakaWindow[0], "Napaka 1");
+            IzpisiNapako(self, ctx, self.IDjiZaNapakaWindow[1], "Napaka 2");
         });
     }
 
     fn auto_save_interval(&self) -> std::time::Duration {
         std::time::Duration::from_secs(30)
     }
+}
+
+fn IzpisiNapako(neki: &mut YTApp, ctx: &egui::Context, id_windowa: u16, napaka: &str){
+
+    //Ustvari nov egui window za napako in mu nastavi id
+    egui::Window::new("Napaka").id(Id::new(id_windowa)).open(&mut neki.open).show(ctx, |ui| {
+        ui.label(napaka);
+    });
 }
