@@ -4,7 +4,7 @@
 mod app;
 
 use eframe::egui;
-use app::MyApp;
+use app::YTApp;
 
 fn main() {
     // Log to stdout (if you run with `RUST_LOG=debug`).
@@ -17,7 +17,7 @@ fn main() {
     eframe::run_native(
         "My egui App",
         options,
-        Box::new(|cc| Box::new(MyApp::new(cc))),
+        Box::new(|cc| Box::new(YTApp::new(cc))),
     );
 
 }

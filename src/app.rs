@@ -1,11 +1,11 @@
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)]
-pub struct MyApp {
+pub struct YTApp {
     name: String,
     age: u32,
 }
 
-impl Default for MyApp {
+impl Default for YTApp {
     fn default() -> Self {
         Self {
             name: "Arthur".to_owned(),
@@ -14,7 +14,7 @@ impl Default for MyApp {
     }
 }
 
-impl MyApp {
+impl YTApp {
     /// Called once before the first frame.
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
         
@@ -31,7 +31,7 @@ impl MyApp {
     }
 }
 
-impl eframe::App for MyApp {
+impl eframe::App for YTApp {
 
     /// Called by the frame work to save state before shutdown.
     fn save(&mut self, storage: &mut dyn eframe::Storage) {
