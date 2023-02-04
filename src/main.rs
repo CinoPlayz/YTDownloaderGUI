@@ -5,20 +5,63 @@ mod app;
 
 use eframe::egui;
 use app::YTApp;
+use eframe::egui::{Style, Visuals};
 
 fn main() {
-    // Log to stdout (if you run with `RUST_LOG=debug`).
+    //Dobi themo računalnika
+    let mode = dark_light::detect();
+    let thema;
+
+    match mode {
+        dark_light::Mode::Dark => {thema = Visuals::dark()},
+        dark_light::Mode::Light => {thema = Visuals::light()},
+        dark_light::Mode::Default => {thema = Visuals::dark()},
+    }
+    
     tracing_subscriber::fmt::init();
 
+    //Window options
     let options = eframe::NativeOptions {
-        initial_window_size: Some(egui::vec2(320.0, 240.0)),
+        icon_data: Some(load_icon("assets/icon/youtube-download.png")), 
+        initial_window_size: Some(egui::Vec2::new(425.0, 620.0)),
+        min_window_size: Some(egui::Vec2::new(425.0, 620.0)),
         ..Default::default()
     };
+    
+    let _native_options = eframe::NativeOptions::default();
     eframe::run_native(
-        "My egui App",
+        "YT Downloader",
         options,
-        Box::new(|cc| Box::new(YTApp::new(cc))),
+        Box::new(|creation_context| {
+            let style = Style {
+                //Spremeni themo gleda themo računalnika
+                visuals: thema,
+                ..Style::default()
+            };
+            creation_context.egui_ctx.set_style(style);
+            Box::new(YTApp::new(creation_context))
+        }),
+
     );
+
+    fn load_icon(path: &str) -> eframe::IconData {
+        let (icon_rgba, icon_width, icon_height) = {
+            let image = image::open(path)
+            .expect("Ne morem odpreti icone")
+            .into_rgba8();
+            let (width, height) = image.dimensions();
+            let rgba = image.into_raw();
+            (rgba, width, height)
+    
+    
+        };
+    
+        eframe::IconData {
+            rgba: icon_rgba,
+            width: icon_width,
+            height: icon_height,
+        }
+    }
 
 }
 
