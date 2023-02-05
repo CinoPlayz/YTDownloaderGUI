@@ -12,6 +12,7 @@ use egui::global_dark_light_mode_switch;
 pub struct YTApp {
     name: String,
     age: u32,
+    picked_path: Option<String>,
     
 
     //Kar se ne rabi shraniti
@@ -33,7 +34,8 @@ impl Default for YTApp {
             OdprtiOkniZaNapako: true,
             IDjiZaNapakaWindow: Vec::from([26252, 18405, 12010, 43838]),
             TextureNapaka: None,
-            PrikaziNapakoUI: true
+            PrikaziNapakoUI: true,
+            picked_path: None
         }
     }
 }
@@ -153,6 +155,20 @@ impl eframe::App for YTApp {
 
             IzpisiNapako(self, ctx, self.IDjiZaNapakaWindow[0], "Napaka 1");
             IzpisiNapako(self, ctx, self.IDjiZaNapakaWindow[1], "Napaka 2 dfgfdggggg dsfgedfjigufdn gfdsidgnjdfh sfdsdf");
+
+            if ui.button("Open file…").clicked() {
+                if let Some(path) = rfd::FileDialog::new().pick_folder() {
+                    self.picked_path = Some(path.display().to_string());
+                }
+            }
+
+            if let Some(picked_path) = &self.picked_path {
+                ui.horizontal(|ui| {
+                    ui.label("Picked file:");
+                    ui.monospace(picked_path);
+                });
+            }
+
         });
     }
 
