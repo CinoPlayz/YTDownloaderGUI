@@ -1,29 +1,44 @@
-use std::path::Path;
 
+use std::path::Path;
 use egui::Id;
 use egui::RichText;
 use egui::FontFamily::Proportional;
 use egui::FontId;
 use egui::TextStyle::*;
-use egui::global_dark_light_mode_switch;
+
+use crate::DeliZaslona;
+pub struct GumbEvent{
+    pub kliknjen:bool
+}
 
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)]
 pub struct YTApp {
-    name: String,
-    age: u32,
-    picked_path: Option<String>,
+    pub name: String,
+    pub age: u32,
+    pub PotDoYTDLP: Option<String>,
+    pub PotDoVideo: Option<String>,
     
 
     //Kar se ne rabi shraniti
-    #[serde(skip)]
-    OdprtiOkniZaNapako: bool,
     #[serde(skip)]
     IDjiZaNapakaWindow: Vec<u16>,
     #[serde(skip)]
     TextureNapaka: Option<egui::TextureHandle>,
     #[serde(skip)]
     PrikaziNapakoUI: bool,
+
+    //Nastavitve
+    #[serde(skip)]
+    pub PrikaziNastavitveYTDLPUI: bool,
+    #[serde(skip)]
+    pub NastavitveYTDLPEvent: GumbEvent,
+    #[serde(skip)]
+    pub PrikaziNastavitveLokacijaVidejiUI: bool,
+    #[serde(skip)]
+    pub NastavitveLokacijaVidejiEvent: GumbEvent,
+
+
 }
 
 impl Default for YTApp {
@@ -31,11 +46,17 @@ impl Default for YTApp {
         Self {
             name: "Arthur".to_owned(),
             age: 42,
-            OdprtiOkniZaNapako: true,
+            PotDoYTDLP: None,
+            PotDoVideo: None,
             IDjiZaNapakaWindow: Vec::from([26252, 18405, 12010, 43838]),
-            TextureNapaka: None,
-            PrikaziNapakoUI: true,
-            picked_path: None
+            TextureNapaka: None,           
+            PrikaziNapakoUI: true,         
+            
+            //Nastavitve
+            PrikaziNastavitveYTDLPUI: true,
+            NastavitveYTDLPEvent: GumbEvent { kliknjen: false },
+            PrikaziNastavitveLokacijaVidejiUI: true,
+            NastavitveLokacijaVidejiEvent: GumbEvent { kliknjen: false }
         }
     }
 }
@@ -121,53 +142,27 @@ impl eframe::App for YTApp {
         
         //Zgronji del (TopPanel)
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
-            // The top panel is often a good place for a menu bar:
+            
+            //Doda menubar
             egui::menu::bar(ui, |ui| {
-                ui.menu_button("Program", |ui| {
-                    if ui.button("Zapri").clicked() {
-                        frame.close();
-                    }
-                });
 
-                /*ui.menu_button("Nastavitve", |ui| {
-                    ui.add_sized([400.0, 10.0], egui::TextEdit::singleline(potdoytdlp).hint_text("Pot do yt-dlp.exe"));
-                });*/
-
-                global_dark_light_mode_switch(ui);
+                //Doda izgled in funkcionalnost temu menu baru
+                DeliZaslona::menu_bar::DodajIzgled(self, ui, frame);                
                 
             });
         });
 
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.heading("My egui Application");
-            ui.horizontal(|ui| {
-                let name_label = ui.label("Your name: ");
-                ui.text_edit_singleline(&mut self.name)
-                    .labelled_by(name_label.id);
-            });
-            ui.add(egui::Slider::new(&mut self.age, 0..=120).text("age"));
-            if ui.button("Click each year").clicked() {
-                self.age += 1;
-            }
-            ui.label(format!("Hello '{}', age {}", self.name, self.age));
 
+            DeliZaslona::central_panel::DodajIzgled(self, ui);
+      
+            DeliZaslona::central_panel::DodajIzgledInFunkcionalnostZaDruge(self, ctx);
+            
 
             IzpisiNapako(self, ctx, self.IDjiZaNapakaWindow[0], "Napaka 1");
             IzpisiNapako(self, ctx, self.IDjiZaNapakaWindow[1], "Napaka 2 dfgfdggggg dsfgedfjigufdn gfdsidgnjdfh sfdsdf");
-
-            if ui.button("Open file…").clicked() {
-                if let Some(path) = rfd::FileDialog::new().pick_folder() {
-                    self.picked_path = Some(path.display().to_string());
-                }
-            }
-
-            if let Some(picked_path) = &self.picked_path {
-                ui.horizontal(|ui| {
-                    ui.label("Picked file:");
-                    ui.monospace(picked_path);
-                });
-            }
+        
 
         });
     }
@@ -188,7 +183,7 @@ fn IzpisiNapako(ytapp: &mut YTApp, ctx: &egui::Context, id_windowa: u16, napaka:
     .min_height(100.0)
     .collapsible(false)
     .resizable(false)
-    .open(&mut ytapp.OdprtiOkniZaNapako).show(ctx, |ui| {    
+    .open(&mut ytapp.PrikaziNapakoUI).show(ctx, |ui| {    
         //Dobi podatke iz TextureNapaka
         let texture: &egui::TextureHandle = &ytapp.TextureNapaka.as_mut().unwrap();
 
