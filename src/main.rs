@@ -4,6 +4,7 @@
 mod app;
 mod DeliZaslona;
 mod Funkcionalnost;
+mod structs;
 
 use eframe::egui;
 use app::YTApp;

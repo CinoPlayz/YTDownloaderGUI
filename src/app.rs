@@ -1,21 +1,16 @@
-use std::path::Path;
-use egui::Id;
-use egui::RichText;
+
 use egui::FontFamily::Proportional;
 use egui::FontId;
 use egui::TextStyle::*;
+use std::sync::mpsc::Receiver;
 
 use crate::DeliZaslona;
-use crate::Funkcionalnost;
-pub struct GumbEvent{
-    pub kliknjen: bool,
-    pub napaka: bool
-}
-#[derive(PartialEq, Clone)] 
-pub struct Format{
-    pub Ime: String,
-    pub ID: String,
-}
+//use crate::Funkcionalnost;
+use crate::structs::GumbEvent;
+use crate::structs::PrejetoEvent;
+use crate::structs::Format;
+use crate::Funkcionalnost::skupno::IzpisiNapako;
+
 
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)]
@@ -30,11 +25,15 @@ pub struct YTApp {
 
     //Napaka
     #[serde(skip)]
-    IDjiZaNapakaWindow: Vec<u16>,
+    pub TextureNapaka: Option<egui::TextureHandle>,
     #[serde(skip)]
-    TextureNapaka: Option<egui::TextureHandle>,
+    pub PrikaziNapakoUI: bool,
     #[serde(skip)]
-    PrikaziNapakoUI: bool,
+    pub IDjiZaNapakaWindow: Vec<u16>,
+    #[serde(skip)]
+    pub IzpisujNapako: bool,
+    #[serde(skip)]
+    pub Napaka: String,
 
     //Nastavitve
     #[serde(skip)]
@@ -49,6 +48,13 @@ pub struct YTApp {
     //Central-Panel
     #[serde(skip)]
     pub CPPosljiEvent: GumbEvent,
+    #[serde(skip)]
+    pub CPPosljiPrejeto: PrejetoEvent,
+    #[serde(skip)]
+    pub CPPrikazujSpinner: bool,
+    #[serde(skip)]
+    pub CPReisiverJSON: Option<Receiver<String>>,
+
 
 
     //Funkcionalnost
@@ -67,22 +73,28 @@ impl Default for YTApp {
             age: 42,
             PotDoYTDLP: None,
             PotDoVideo: None,
-            IDjiZaNapakaWindow: Vec::from([26252, 18405, 12010, 43838]),
+            IDjiZaNapakaWindow: Vec::from([64345, 38015, 41661, 32302, 35660, 64159, 48057, 12441, 15910, 48957, 
+                30690, 29088, 22894, 54035, 19348, 34923, 59481, 45316, 46313, 50076]),
             TextureNapaka: None,           
-            PrikaziNapakoUI: true,         
+            PrikaziNapakoUI: true,  
+            IzpisujNapako: false,    
+            Napaka: "".to_string(),   
             
             //Nastavitve
             PrikaziNastavitveYTDLPUI: true,
-            NastavitveYTDLPEvent: GumbEvent { kliknjen: false, napaka: false },
+            NastavitveYTDLPEvent: GumbEvent { kliknjen: false },
             PrikaziNastavitveLokacijaVidejiUI: true,
-            NastavitveLokacijaVidejiEvent: GumbEvent { kliknjen: false, napaka: false },
+            NastavitveLokacijaVidejiEvent: GumbEvent { kliknjen: false},
 
             //Central-Panel
-            CPPosljiEvent: GumbEvent { kliknjen: false, napaka: false },
+            CPPosljiEvent: GumbEvent { kliknjen: false },
+            CPPosljiPrejeto: PrejetoEvent {..Default::default() },
+            CPPrikazujSpinner: false,
+            CPReisiverJSON: None,
 
             //Funkcionalnost
             Formati: Vec::new(),
-            IzbranFormat: Format { Ime: "".to_string(), ID:"".to_string() }
+            IzbranFormat: Format { Ime: "".to_string(), ID:"".to_string(), Vrsta:"".to_string() }
         }
     }
 }
@@ -124,36 +136,7 @@ impl YTApp {
         Default::default()        
     }
 
-    fn nalozi_sliko_iz_poti(&mut self, path: &std::path::Path) -> Result<egui::ColorImage, image::ImageError> {
-        let image = image::io::Reader::open(path)?.decode()?;
-        let size = [image.width() as _, image.height() as _];
-        let image_buffer = image.to_rgba8();
-        let pixels = image_buffer.as_flat_samples();
-        Ok(egui::ColorImage::from_rgba_unmultiplied(
-            size,
-            pixels.as_slice(),
-        ))
-    }
-
-    fn nalozi_sliko_napaka(&mut self, ctx: &egui::Context) {
-
-        if self.TextureNapaka.is_none(){
-            //Dobi podatke iz slike
-            let nalozi_sliko = self.nalozi_sliko_iz_poti(Path::new("assets/icon/napaka-icon-36px.png")).expect("Ni možno naložiti slike");
-
-            //Nastavi TextureNapaka na spodnje podatke
-            self.TextureNapaka.get_or_insert_with(|| {           
-
-                // Load the texture only once.
-                ctx.load_texture(
-                    "Napaka_slika",
-                    nalozi_sliko,
-                    Default::default()
-                )
-            });
-        }
-       
-    }
+   
 
 }
 
@@ -180,9 +163,9 @@ impl eframe::App for YTApp {
 
 
         egui::CentralPanel::default().show(ctx, |ui| {
-
-            DeliZaslona::central_panel::DodajFunkcionalnost(self, ctx);
+            
             DeliZaslona::central_panel::DodajIzgled(self, ui);
+            DeliZaslona::central_panel::DodajFunkcionalnost(self, ctx);
 
             
       
@@ -190,7 +173,7 @@ impl eframe::App for YTApp {
             
 
             IzpisiNapako(self, ctx, self.IDjiZaNapakaWindow[0], "Napaka 1");
-            IzpisiNapako(self, ctx, self.IDjiZaNapakaWindow[1], "Napaka 2 dfgfdggggg dsfgedfjigufdn gfdsidgnjdfh sfdsdf");
+            IzpisiNapako(self, ctx,  self.IDjiZaNapakaWindow[1], "Napaka 2 dfgfdggggg dsfgedfjigufdn gfdsidgnjdfh sfdsdf");
         
 
         });
@@ -201,29 +184,3 @@ impl eframe::App for YTApp {
     }
 }
 
-fn IzpisiNapako(ytapp: &mut YTApp, ctx: &egui::Context, id_windowa: u16, napaka: &str){
-
-    ytapp.nalozi_sliko_napaka(ctx);
-
-    //Ustvari nov egui window za napako in mu nastavi id
-    egui::Window::new(RichText::new("Napaka").size(20.0))
-    .id(Id::new(id_windowa))
-    .min_width(200.0)
-    .min_height(100.0)
-    .collapsible(false)
-    .resizable(false)
-    .open(&mut ytapp.PrikaziNapakoUI).show(ctx, |ui| {    
-        //Dobi podatke iz TextureNapaka
-        let texture: &egui::TextureHandle = &ytapp.TextureNapaka.as_mut().unwrap();
-
-        //Postavi v grid zato da sta v eni vrstici
-        egui::Grid::new("586013").show(ui, |ui| {
-            ui.image(texture, texture.size_vec2());
-
-            ui.label(napaka);
-            ui.end_row();
-        });
-      
-
-    });
-}
