@@ -1,22 +1,49 @@
 use egui::Ui;
 use egui::RichText;
 use crate::app::YTApp;
+use crate::Funkcionalnost;
 
 pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
-    ui.heading("My egui Application");
-    ui.horizontal(|ui| {
-        let name_label = ui.label("Your name: ");
-        ui.text_edit_singleline(&mut ytapp.name)
-            .labelled_by(name_label.id);
+    //Centrira elemente
+    ui.vertical_centered(|ui| {
+        ui.heading("Prenesi Videje");
+
+        let url_label = ui.label("URL: ");
+        ui.text_edit_singleline(&mut ytapp.URL).labelled_by(url_label.id);
+
+        if ui.button("Pošlji").clicked(){
+            ytapp.CPPosljiEvent.kliknjen = true;
+        }
+
+        if ytapp.CPPosljiEvent.napaka == false {
+            let izbrani = &mut ytapp.IzbranFormat;
+            let neki = &ytapp.Formati[0].Ime;
+            egui::ComboBox::from_label("Select one!")
+                .selected_text(format!("{}", izbrani.Ime))
+                .show_ui(ui, |ui| {
+                    ui.selectable_value( izbrani,  ytapp.Formati[0].clone(), &ytapp.Formati[0].Ime);
+                    ui.selectable_value(izbrani,  ytapp.Formati[1].clone(), &ytapp.Formati[1].Ime);
+                }
+            );
+
+            ui.label(&izbrani.ID);
+        }
+
     });
+    
     ui.add(egui::Slider::new(&mut ytapp.age, 0..=120).text("age"));
     if ui.button("Click each year").clicked() {
         ytapp.age += 1;
     }
-    ui.label(format!("Hello '{}', age {}", ytapp.name, ytapp.age));
+    //ui.label(format!("Hello '{}', age {}", ytapp.name, ytapp.age));
 
 
    
+}
+
+
+pub fn DodajFunkcionalnost(ytapp: &mut YTApp, ctx: &egui::Context){
+    Funkcionalnost::podatki_video::PridobiPodatkeOdVideja(ytapp, ctx);
 }
 
 pub fn DodajIzgledInFunkcionalnostZaDruge(ytapp: &mut YTApp, ctx: &egui::Context){

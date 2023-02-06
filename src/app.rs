@@ -1,4 +1,3 @@
-
 use std::path::Path;
 use egui::Id;
 use egui::RichText;
@@ -7,20 +6,29 @@ use egui::FontId;
 use egui::TextStyle::*;
 
 use crate::DeliZaslona;
+use crate::Funkcionalnost;
 pub struct GumbEvent{
-    pub kliknjen:bool
+    pub kliknjen: bool,
+    pub napaka: bool
+}
+#[derive(PartialEq, Clone)] 
+pub struct Format{
+    pub Ime: String,
+    pub ID: String,
 }
 
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)]
 pub struct YTApp {
-    pub name: String,
+    pub URL: String,
     pub age: u32,
     pub PotDoYTDLP: Option<String>,
     pub PotDoVideo: Option<String>,
     
 
     //Kar se ne rabi shraniti
+
+    //Napaka
     #[serde(skip)]
     IDjiZaNapakaWindow: Vec<u16>,
     #[serde(skip)]
@@ -38,13 +46,24 @@ pub struct YTApp {
     #[serde(skip)]
     pub NastavitveLokacijaVidejiEvent: GumbEvent,
 
+    //Central-Panel
+    #[serde(skip)]
+    pub CPPosljiEvent: GumbEvent,
+
+
+    //Funkcionalnost
+    #[serde(skip)]
+    pub Formati: Vec<Format>,
+    #[serde(skip)]
+    pub IzbranFormat: Format,
+
 
 }
 
 impl Default for YTApp {
     fn default() -> Self {
         Self {
-            name: "Arthur".to_owned(),
+            URL: "".to_owned(),
             age: 42,
             PotDoYTDLP: None,
             PotDoVideo: None,
@@ -54,9 +73,16 @@ impl Default for YTApp {
             
             //Nastavitve
             PrikaziNastavitveYTDLPUI: true,
-            NastavitveYTDLPEvent: GumbEvent { kliknjen: false },
+            NastavitveYTDLPEvent: GumbEvent { kliknjen: false, napaka: false },
             PrikaziNastavitveLokacijaVidejiUI: true,
-            NastavitveLokacijaVidejiEvent: GumbEvent { kliknjen: false }
+            NastavitveLokacijaVidejiEvent: GumbEvent { kliknjen: false, napaka: false },
+
+            //Central-Panel
+            CPPosljiEvent: GumbEvent { kliknjen: false, napaka: false },
+
+            //Funkcionalnost
+            Formati: Vec::new(),
+            IzbranFormat: Format { Ime: "".to_string(), ID:"".to_string() }
         }
     }
 }
@@ -155,7 +181,10 @@ impl eframe::App for YTApp {
 
         egui::CentralPanel::default().show(ctx, |ui| {
 
+            DeliZaslona::central_panel::DodajFunkcionalnost(self, ctx);
             DeliZaslona::central_panel::DodajIzgled(self, ui);
+
+            
       
             DeliZaslona::central_panel::DodajIzgledInFunkcionalnostZaDruge(self, ctx);
             

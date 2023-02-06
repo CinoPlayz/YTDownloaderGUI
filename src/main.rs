@@ -3,6 +3,7 @@
 
 mod app;
 mod DeliZaslona;
+mod Funkcionalnost;
 
 use eframe::egui;
 use app::YTApp;
