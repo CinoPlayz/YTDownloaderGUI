@@ -1,7 +1,6 @@
 use egui::Ui;
 use egui::RichText;
 use egui::style::Margin;
-use crate::structs::Format;
 use crate::app::YTApp;
 use crate::Funkcionalnost;
 use crate::structs::PrejetoEvent;
@@ -20,10 +19,6 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
             let napaka = ytapp.Napaka.clone();
             IzpisiNapako(ytapp, ui.ctx(), ytapp.IDjiZaNapakaWindow[3], napaka)
         }
-
-        ytapp.Formati.push(Format { ID: "23".to_string(), VideoFormat: "AV1".to_string(), Rezolucija: "1920x1080".to_string()});
-        ytapp.Formati.push(Format { ID: "44".to_string(), VideoFormat: "AV1".to_string(), Rezolucija: "2560x1080".to_string()});
-          
 
         ui.heading("Prenesi Videje");
 
@@ -53,19 +48,139 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
             });            
         }
 
+       
+
         //Doda ComboBox, če ni napak pri pridobivanju informacij za video
         if ytapp.CPPosljiPrejeto.aktivno == true && ytapp.CPPosljiPrejeto.napaka == false {
-            let izbrani = &mut ytapp.IzbranFormat;
-            egui::ComboBox::from_label("Izberi rezolucijo!")
-                .selected_text(format!("{}", izbrani.Rezolucija))
-                .show_ui(ui, |ui| {
-                    ui.selectable_value( izbrani,  ytapp.Formati[0].clone(), &ytapp.Formati[0].Rezolucija);
-                    ui.selectable_value(izbrani,  ytapp.Formati[1].clone(), &ytapp.Formati[1].Rezolucija);
-                }
-            );
 
-            let leabel = format!("{}   {}   {}", &izbrani.ID, &izbrani.Rezolucija, &izbrani.VideoFormat);            
+            //Margin za centriranje
+            
+            let margin_centriranje = (ui.ctx().used_size()[0] - 430.0) / 2.0;
+            let margin = Margin{left: margin_centriranje, right: 0.0, top: 0.0, bottom: 0.0};
+
+            egui::Frame::none()
+            .inner_margin(margin)
+            .show(ui, |ui|{
+                
+
+                egui::Grid::new("71192")
+                .spacing([20.0, 3.0])                
+                .show(ui, |ui| {
+
+                    ui.vertical_centered(|ui|{
+                        ui.label("Rezolucija:");
+                    });              
+                    
+                    ui.vertical_centered(|ui|{
+                        ui.horizontal_centered(|ui|{
+                            ui.label("Kodek:");
+                            ui.label("ℹ").on_hover_text("AVC(H.264) Slabe kvalitete, vendar zelo podprti\nAV1 Zelo dobre kvalitete, vendar slabo podprti\nVP9 Dobre kvalitete in podprti dobro"); 
+                        });
+                        
+                    });
+
+                    ui.vertical_centered(|ui|{
+                        ui.label("Kategorija:");
+                    });
+                    
+                    ui.end_row();
+
+                    //Da prevzeto vrednost
+                    let dolzina = ytapp.Formati.len();
+                    
+                    if ytapp.IzbranFormat.ID == "" {
+                        for i in 0..dolzina{
+                            if ytapp.Formati[i].Rezolucija.contains("1920x") || ytapp.Formati[i].Rezolucija.contains("2560x") {
+                                ytapp.IzbranFormat = ytapp.Formati[i].clone();
+                            }
+                        }
+                    }
+        
+
+                
+                    //Rezolucija
+                    egui::Frame::none()
+                    .show(ui, |ui|{
+                        egui::ComboBox::from_id_source("Izberi rezolucijo!")
+                        .selected_text(format!("{}", ytapp.IzbranFormat.Rezolucija))
+                        .width(130.0)
+                        .show_ui(ui, |ui| {
+
+                            let mut ze_dodani: Vec<String> = Vec::new();
+                    
+                            //Izpiše vse rezolucije, ki še niso bile
+                            for i in 0..dolzina{
+
+                                if !ze_dodani.contains(&ytapp.Formati[i].Rezolucija){
+                                    ui.selectable_value( &mut ytapp.IzbranFormat,  ytapp.Formati[i].clone(), &ytapp.Formati[i].Rezolucija);
+                                    ze_dodani.push(ytapp.Formati[i].Rezolucija.clone());
+                                    
+                                }
+                                
+                            }
+                        }
+                    );
+                    });
+
+                    //Kodek
+                    egui::Frame::none()
+                    .show(ui, |ui|{
+                    egui::ComboBox::from_id_source("Izberi Kodek!")
+                    .selected_text(format!("{}", ytapp.IzbranFormat.VideoFormat))
+                    .width(130.0)                
+                    .show_ui(ui, |ui| {
+
+                        let dolzina = ytapp.Formati.len();
+
+                        //Izpiše vse kodeke na izbiro
+                        for i in 0..dolzina{
+                            if ytapp.Formati[i].Rezolucija == ytapp.IzbranFormat.Rezolucija {
+                                ui.selectable_value( &mut ytapp.IzbranFormat,  ytapp.Formati[i].clone(), &ytapp.Formati[i].VideoFormat);
+                            }
+                            
+                        }
+
+                    });
+                
+                    
+                    });
+
+
+                    //Kategorije                   
+
+                    egui::Frame::none()
+                    .show(ui, |ui|{
+                    egui::ComboBox::from_id_source("Izberi Kategorijo!")
+                    .selected_text(format!("{}", ytapp.IzbranFormat.VideoFormat))
+                    .width(130.0)                
+                    .show_ui(ui, |ui| {
+
+                        let dolzina = ytapp.Formati.len();
+
+                        //Izpiše vse kodeke na izbiro
+                        for i in 0..dolzina{
+                            if ytapp.Formati[i].Rezolucija == ytapp.IzbranFormat.Rezolucija {
+                                ui.selectable_value( &mut ytapp.IzbranFormat,  ytapp.Formati[i].clone(), &ytapp.Formati[i].VideoFormat);
+                            }
+                            
+                        }
+
+                    });
+                
+                    });
+
+                    ui.end_row();
+
+                   
+                    
+                });
+
+            });
+
+            let leabel = format!("{}   {}   {}", &ytapp.IzbranFormat.ID, &ytapp.IzbranFormat.Rezolucija, &ytapp.IzbranFormat.VideoFormat);            
             ui.label(leabel);
+
+         
         }
 
     });
@@ -74,7 +189,6 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
     if ui.button("Click each year").clicked() {
         ytapp.age += 1;
     }
-    //ui.label(format!("Hello '{}', age {}", ytapp.name, ytapp.age));
 
 
    

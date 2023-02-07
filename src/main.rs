@@ -26,8 +26,8 @@ fn main() {
     //Window options
     let options = eframe::NativeOptions {
         icon_data: Some(load_icon("assets/icon/youtube-download.png")), 
-        initial_window_size: Some(egui::Vec2::new(425.0, 620.0)),
-        min_window_size: Some(egui::Vec2::new(425.0, 620.0)),
+        initial_window_size: Some(egui::Vec2::new(490.0, 620.0)),
+        min_window_size: Some(egui::Vec2::new(480.0, 620.0)),
         ..Default::default()
     };
     

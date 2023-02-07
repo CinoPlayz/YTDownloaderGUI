@@ -6,13 +6,11 @@ use std::process::Command;
 use std::sync::mpsc::{self, Sender, Receiver};
 use std::thread;
 use std::os::windows::process::CommandExt;
+use serde_json::{Value};
 
 const CREATE_NO_WINDOW: u32 = 0x08000000;
 
 pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp, _ctx: &egui::Context){
-    ytapp.Formati.push(Format { ID: "23".to_string(), VideoFormat: "AV1".to_string(), Rezolucija: "1920x1080".to_string()});
-    ytapp.Formati.push(Format { ID: "44".to_string(), VideoFormat: "AV1".to_string(), Rezolucija: "2560x1080".to_string()});
-         
 
     //Preveri da Reciever ni že slučajno povjen (uporabljen)
     if !ytapp.CPReisiverJSONPoln {
@@ -28,7 +26,7 @@ pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp, _ctx: &egui::Context){
         //Zažene nov thread, kjer izvede postopek za pridobivanje informacij
         thread::spawn(move|| {
 
-            let mut sporocilo = String::from("Ok");
+            let sporocilo;
 
             //Nastavi env pot tam kjer je yt-dlp
             match env::set_current_dir(&PotDoYTDLP){
@@ -51,7 +49,9 @@ pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp, _ctx: &egui::Context){
                                 //AVC(H.264) videji so slabe kvalitete, vendar podprti skoraj da vsepovsod
                                 //AV1 videji so zelo dobre kvalitete, vendar ne tako dobro podprti
                                 //VP9 so dobre kvalitete in podprti kar dobro
-                                println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+
+                                sporocilo = format!("[ok]{}", String::from_utf8_lossy(&output.stdout).to_string());
+
                             }
                             
                         },
@@ -73,12 +73,23 @@ pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp, _ctx: &egui::Context){
 
     //Preveri če je pridobil kakšno informacijo
     match ytapp.CPReisiverJSON.try_recv() {
-        Ok(sporocilo) => {
+        Ok(mut sporocilo) => {
 
             ytapp.CPPosljiPrejeto.aktivno = true;
 
+            //Dobi sporocilo, če je vredu vse potem so prve 4 byti [ok]
+            let mut prvi_4 = sporocilo.clone();
+            prvi_4.truncate(4);
+
+            //Odstrani prve štiri znake
+            sporocilo.remove(0);
+            sporocilo.remove(0);
+            sporocilo.remove(0);
+            sporocilo.remove(0);
+
+
             //Preveri če je bila kakšna napaka
-            if sporocilo != "Ok" {
+            if prvi_4 != "[ok]" {
                 ytapp.CPPosljiPrejeto.napaka = true;
                 
                 ytapp.PrikaziNapakoUI = true;
@@ -87,6 +98,31 @@ pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp, _ctx: &egui::Context){
             }
             else{
                 ytapp.CPPosljiPrejeto.napaka = false;
+
+                ytapp.Formati.clear();
+
+                let v: Value = serde_json::from_str(&sporocilo).unwrap();
+
+                if let Some(formats) = v["formats"].as_array(){
+                    for format in formats{
+
+                        //Preveri da je tak format, kjer je videjo in nič audia
+                        if format["video_ext"] != "none" && format["audio_ext"] == "none" {
+                            let id = format["format_id"].to_string().replace("\"", "");
+                            let mut video_format = format["vcodec"].to_string().replace("\"", "");
+                            let rezolucija = format["resolution"].to_string().replace("\"", "");
+
+                            if video_format.contains("av01"){ video_format= "AV1".to_string();}
+                            else if video_format.contains("avc"){ video_format= "AVC".to_string();}
+                            else if video_format.contains("vp9"){ video_format= "VP9".to_string();}
+                            
+                            //ytapp.Formati.push(Format { ID: format["format_id"].to_string(), VideoFormat: format["vcodec"].to_string(), Rezolucija: format["resolution"].to_string() })
+                            ytapp.Formati.push(Format { ID: id, VideoFormat: video_format, Rezolucija: rezolucija });
+                        }
+                    }
+                }
+
+                //println!("{}" ,sporocilo);
             }
             
             //Neha prikazovati spinner
@@ -95,8 +131,6 @@ pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp, _ctx: &egui::Context){
             ytapp.CPReisiverJSONPoln = false;
         },
         Err(_) => {
-            //println!("tuk2: {}", e);
-            //ctx.request_repaint();
         },
     }
     
