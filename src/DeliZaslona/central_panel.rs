@@ -21,9 +21,9 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
             IzpisiNapako(ytapp, ui.ctx(), ytapp.IDjiZaNapakaWindow[3], napaka)
         }
 
-        ytapp.Formati.push(Format { Ime: "Ime1".to_string(), ID: "23".to_string(), Vrsta: "Video".to_string()});
-        ytapp.Formati.push(Format { Ime: "Ime2".to_string(), ID: "44".to_string(), Vrsta: "Video".to_string()});
-    
+        ytapp.Formati.push(Format { ID: "23".to_string(), VideoFormat: "AV1".to_string(), Rezolucija: "1920x1080".to_string()});
+        ytapp.Formati.push(Format { ID: "44".to_string(), VideoFormat: "AV1".to_string(), Rezolucija: "2560x1080".to_string()});
+          
 
         ui.heading("Prenesi Videje");
 
@@ -33,8 +33,8 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
         .inner_margin(margin10)
         .show(ui, |ui| {
 
-            let url_label = ui.label("URL: ");
-            ui.text_edit_singleline(&mut ytapp.URL).labelled_by(url_label.id);
+            ui.label("URL: ");
+            ui.add(egui::TextEdit::singleline(&mut ytapp.URL).desired_width(400.0));
     
             if ui.button("Pošlji").clicked(){
                 ytapp.CPPosljiEvent.kliknjen = true;
@@ -57,14 +57,15 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
         if ytapp.CPPosljiPrejeto.aktivno == true && ytapp.CPPosljiPrejeto.napaka == false {
             let izbrani = &mut ytapp.IzbranFormat;
             egui::ComboBox::from_label("Izberi rezolucijo!")
-                .selected_text(format!("{}", izbrani.Ime))
+                .selected_text(format!("{}", izbrani.Rezolucija))
                 .show_ui(ui, |ui| {
-                    ui.selectable_value( izbrani,  ytapp.Formati[0].clone(), &ytapp.Formati[0].Ime);
-                    ui.selectable_value(izbrani,  ytapp.Formati[1].clone(), &ytapp.Formati[1].Ime);
+                    ui.selectable_value( izbrani,  ytapp.Formati[0].clone(), &ytapp.Formati[0].Rezolucija);
+                    ui.selectable_value(izbrani,  ytapp.Formati[1].clone(), &ytapp.Formati[1].Rezolucija);
                 }
             );
 
-            ui.label(&izbrani.ID);
+            let leabel = format!("{}   {}   {}", &izbrani.ID, &izbrani.Rezolucija, &izbrani.VideoFormat);            
+            ui.label(leabel);
         }
 
     });

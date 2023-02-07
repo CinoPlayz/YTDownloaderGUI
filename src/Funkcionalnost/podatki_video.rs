@@ -10,8 +10,8 @@ use std::os::windows::process::CommandExt;
 const CREATE_NO_WINDOW: u32 = 0x08000000;
 
 pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp, _ctx: &egui::Context){
-    ytapp.Formati.push(Format { Ime: "Ime1".to_string(), ID: "23".to_string(), Vrsta: "Video".to_string()});
-    ytapp.Formati.push(Format { Ime: "Ime2".to_string(), ID: "44".to_string(), Vrsta: "Video".to_string()});
+    ytapp.Formati.push(Format { ID: "23".to_string(), VideoFormat: "AV1".to_string(), Rezolucija: "1920x1080".to_string()});
+    ytapp.Formati.push(Format { ID: "44".to_string(), VideoFormat: "AV1".to_string(), Rezolucija: "2560x1080".to_string()});
          
 
     //Preveri da Reciever ni že slučajno povjen (uporabljen)
@@ -24,7 +24,6 @@ pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp, _ctx: &egui::Context){
         let (sender, receiver): (Sender<String>, Receiver<String>) = mpsc::channel();
         ytapp.CPReisiverJSON = receiver;
         ytapp.CPReisiverJSONPoln = true;
-        println!("reciever");
 
         //Zažene nov thread, kjer izvede postopek za pridobivanje informacij
         thread::spawn(move|| {
@@ -48,10 +47,12 @@ pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp, _ctx: &egui::Context){
                             if stderr != ""{
                                 sporocilo = stderr.to_string();
                             }
-
-                            println!("status: {}", output.status);
-                            //println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
-                            println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
+                            else{
+                                //AVC(H.264) videji so slabe kvalitete, vendar podprti skoraj da vsepovsod
+                                //AV1 videji so zelo dobre kvalitete, vendar ne tako dobro podprti
+                                //VP9 so dobre kvalitete in podprti kar dobro
+                                println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
+                            }
                             
                         },
                         Err(e) => {
@@ -63,7 +64,7 @@ pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp, _ctx: &egui::Context){
             }
 
             match sender.send(sporocilo){
-                Ok(_) => {println!("Poslano...")},
+                Ok(_) => {},
                 Err(e) => {println!("{}", e)},
             }  
         });

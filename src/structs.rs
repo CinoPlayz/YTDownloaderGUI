@@ -19,6 +19,6 @@ impl Default for PrejetoEvent{
 #[derive(PartialEq, Clone)] 
 pub struct Format{
     pub ID: String,
-    pub Ime: String,
-    pub Vrsta: String,    
+    pub VideoFormat: String,    
+    pub Rezolucija: String,
 }

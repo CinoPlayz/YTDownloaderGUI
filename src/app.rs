@@ -98,7 +98,7 @@ impl Default for YTApp {
 
             //Funkcionalnost
             Formati: Vec::new(),
-            IzbranFormat: Format { Ime: "".to_string(), ID:"".to_string(), Vrsta:"".to_string() }
+            IzbranFormat: Format { ID:"".to_string(), VideoFormat:"".to_string(), Rezolucija:"".to_string() }
         }
     }
 }
@@ -178,8 +178,7 @@ impl eframe::App for YTApp {
             ui.label("neki \n dsfsd");
 
             IzpisiNapako(self, ctx, self.IDjiZaNapakaWindow[0], "Napaka 1". to_string());
-            let string = "line one
-line two";
+            let string = "line one \n line two";
             IzpisiNapako(self, ctx,  self.IDjiZaNapakaWindow[1], string.to_string());
         
 
