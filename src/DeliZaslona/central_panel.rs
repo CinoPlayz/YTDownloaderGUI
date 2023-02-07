@@ -18,8 +18,9 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
 
         if ytapp.IzpisujNapako == true{
             let napaka = ytapp.Napaka.clone();
-            IzpisiNapako(ytapp, ui.ctx(), ytapp.IDjiZaNapakaWindow[3], &napaka)
+            IzpisiNapako(ytapp, ui.ctx(), ytapp.IDjiZaNapakaWindow[3], napaka)
         }
+
         ytapp.Formati.push(Format { Ime: "Ime1".to_string(), ID: "23".to_string(), Vrsta: "Video".to_string()});
         ytapp.Formati.push(Format { Ime: "Ime2".to_string(), ID: "44".to_string(), Vrsta: "Video".to_string()});
     
@@ -88,8 +89,7 @@ pub fn DodajFunkcionalnost(ytapp: &mut YTApp, ctx: &egui::Context){
 
         //Pridobi informacije o videju
         Funkcionalnost::podatki_video::PridobiPodatkeOdVideja(ytapp, ctx);  
-
-        ytapp.CPPosljiEvent.kliknjen = false;      
+  
     }
     
 }

@@ -9,19 +9,21 @@ use std::os::windows::process::CommandExt;
 
 const CREATE_NO_WINDOW: u32 = 0x08000000;
 
-pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp, ctx: &egui::Context){
+pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp, _ctx: &egui::Context){
     ytapp.Formati.push(Format { Ime: "Ime1".to_string(), ID: "23".to_string(), Vrsta: "Video".to_string()});
     ytapp.Formati.push(Format { Ime: "Ime2".to_string(), ID: "44".to_string(), Vrsta: "Video".to_string()});
-    ytapp.CPPosljiEvent.kliknjen = false;  
-
-    let PotDoYTDLP = ytapp.PotDoYTDLP.as_ref().unwrap().clone();
-    let URL = ytapp.URL.clone();
+         
 
     //Preveri da Reciever ni že slučajno povjen (uporabljen)
-    if ytapp.CPReisiverJSON.is_none(){
+    if !ytapp.CPReisiverJSONPoln {
+
+        let PotDoYTDLP = ytapp.PotDoYTDLP.as_ref().unwrap().clone();
+        let URL = ytapp.URL.clone();
+
         //Odpre nov kanal za prenos informacij
         let (sender, receiver): (Sender<String>, Receiver<String>) = mpsc::channel();
-        ytapp.CPReisiverJSON = Some(receiver);
+        ytapp.CPReisiverJSON = receiver;
+        ytapp.CPReisiverJSONPoln = true;
         println!("reciever");
 
         //Zažene nov thread, kjer izvede postopek za pridobivanje informacij
@@ -39,8 +41,14 @@ pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp, ctx: &egui::Context){
                     .output();
 
                     match output {
-                        //Preveri če je vredu, če je potem doda podatke v struct
+                        //Preveri če je vredu napisan command
                         Ok(output) => {
+                            //Preveri če je prišlo na napako med izvajanjem
+                            let stderr =  String::from_utf8_lossy(&output.stderr);
+                            if stderr != ""{
+                                sporocilo = stderr.to_string();
+                            }
+
                             println!("status: {}", output.status);
                             //println!("stdout: {}", String::from_utf8_lossy(&output.stdout));
                             println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
@@ -60,13 +68,15 @@ pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp, ctx: &egui::Context){
             }  
         });
     }
-    
+   
 
     //Preveri če je pridobil kakšno informacijo
-    match ytapp.CPReisiverJSON.as_ref().unwrap().try_recv() {
+    match ytapp.CPReisiverJSON.try_recv() {
         Ok(sporocilo) => {
+
             ytapp.CPPosljiPrejeto.aktivno = true;
-            println!("tuk");
+
+            //Preveri če je bila kakšna napaka
             if sporocilo != "Ok" {
                 ytapp.CPPosljiPrejeto.napaka = true;
                 
@@ -80,9 +90,11 @@ pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp, ctx: &egui::Context){
             
             //Neha prikazovati spinner
             ytapp.CPPrikazujSpinner = false;
+            ytapp.CPPosljiEvent.kliknjen = false;
+            ytapp.CPReisiverJSONPoln = false;
         },
-        Err(e) => {
-            println!("tuk2: {}", e);
+        Err(_) => {
+            //println!("tuk2: {}", e);
             //ctx.request_repaint();
         },
     }

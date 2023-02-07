@@ -2,6 +2,7 @@
 use egui::FontFamily::Proportional;
 use egui::FontId;
 use egui::TextStyle::*;
+use std::sync::mpsc;
 use std::sync::mpsc::Receiver;
 
 use crate::DeliZaslona;
@@ -53,7 +54,9 @@ pub struct YTApp {
     #[serde(skip)]
     pub CPPrikazujSpinner: bool,
     #[serde(skip)]
-    pub CPReisiverJSON: Option<Receiver<String>>,
+    pub CPReisiverJSON: Receiver<String>,
+    #[serde(skip)]
+    pub CPReisiverJSONPoln: bool,
 
 
 
@@ -90,7 +93,8 @@ impl Default for YTApp {
             CPPosljiEvent: GumbEvent { kliknjen: false },
             CPPosljiPrejeto: PrejetoEvent {..Default::default() },
             CPPrikazujSpinner: false,
-            CPReisiverJSON: None,
+            CPReisiverJSON: mpsc::channel().1,
+            CPReisiverJSONPoln: false,
 
             //Funkcionalnost
             Formati: Vec::new(),
@@ -171,9 +175,12 @@ impl eframe::App for YTApp {
       
             DeliZaslona::central_panel::DodajIzgledInFunkcionalnostZaDruge(self, ctx);
             
+            ui.label("neki \n dsfsd");
 
-            IzpisiNapako(self, ctx, self.IDjiZaNapakaWindow[0], "Napaka 1");
-            IzpisiNapako(self, ctx,  self.IDjiZaNapakaWindow[1], "Napaka 2 dfgfdggggg dsfgedfjigufdn gfdsidgnjdfh sfdsdf");
+            IzpisiNapako(self, ctx, self.IDjiZaNapakaWindow[0], "Napaka 1". to_string());
+            let string = "line one
+line two";
+            IzpisiNapako(self, ctx,  self.IDjiZaNapakaWindow[1], string.to_string());
         
 
         });

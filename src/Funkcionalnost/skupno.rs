@@ -34,7 +34,7 @@ fn nalozi_sliko_napaka(ytapp: &mut YTApp, ctx: &egui::Context) {
    
 }
 
-pub fn IzpisiNapako(ytapp: &mut YTApp, ctx: &egui::Context, ID: u16, napaka: &str){
+pub fn IzpisiNapako(ytapp: &mut YTApp, ctx: &egui::Context, ID: u16, napaka: String){
 
     nalozi_sliko_napaka(ytapp, ctx);
 
@@ -49,14 +49,45 @@ pub fn IzpisiNapako(ytapp: &mut YTApp, ctx: &egui::Context, ID: u16, napaka: &st
         //Dobi podatke iz TextureNapaka
         let texture: &egui::TextureHandle = &ytapp.TextureNapaka.as_mut().unwrap();
 
+        //Dobi besedilo razdeljeno na več vrstič
+        let napaka_multi_line = NarediNoveVrstice(napaka);
+
         //Postavi v grid zato da sta v eni vrstici
         egui::Grid::new("586013").show(ui, |ui| {
             ui.image(texture, texture.size_vec2());
-
-            ui.label(napaka);
+            ui.label(egui::RichText::new(napaka_multi_line));
             ui.end_row();
         });
       
 
     });
+}
+
+
+pub fn NarediNoveVrstice(besedilo: String) -> String{
+    let mut novo_besedilo = String::new();
+    let mut koliko_bytov: u32 = 0;
+    let mut nova_beseda;
+
+    //Na vsakih 100 bajtov naredi novo vrstico
+    for beseda in besedilo.split_whitespace(){
+
+        nova_beseda = String::from(beseda);
+        koliko_bytov += beseda.len() as u32;
+
+        if koliko_bytov > 30 {
+            nova_beseda.push_str("\n");
+            koliko_bytov = 0;
+        }
+        else{
+            nova_beseda.push(' ');
+        }
+
+
+        novo_besedilo.push_str(nova_beseda.as_str());
+    }   
+
+    return  novo_besedilo;
+
+    
 }
