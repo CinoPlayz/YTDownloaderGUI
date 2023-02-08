@@ -76,7 +76,7 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
            
             
             if ytapp.Tip == "Video"{   
-                 // region: Videjo Izbira
+                // region: Videjo Izbira
                 //Margin za centriranje             
                 let mut margin_centriranje = (ui.ctx().used_size()[0] - 510.0) / 2.0;
                 if margin_centriranje < 15.0 {margin_centriranje = 5.0}
@@ -205,6 +205,7 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
 
             }
             else{
+                // region: Audio Izbira
                 //Žanra                 
                 ui.label("Žanra:");
 
@@ -230,6 +231,8 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
                     });
             
                 });
+
+                // endregion
             }
 
          
@@ -313,8 +316,6 @@ pub fn DodajIzgledInFunkcionalnostZaDruge(ytapp: &mut YTApp, ctx: &egui::Context
 
     // endregion
 
-
-
     // region: Videji Lokacija okno
     if ytapp.NastavitveLokacijaVidejiEvent.kliknjen {            
         //Ustvari novo okno in v njega da možnosti za nastavit
@@ -327,20 +328,25 @@ pub fn DodajIzgledInFunkcionalnostZaDruge(ytapp: &mut YTApp, ctx: &egui::Context
         .open(&mut ytapp.PrikaziNastavitveLokacijaVidejiUI).show(ctx, |ui| {    
 
             //Postavi v grid zato da sta v eni vrstici
-            egui::Grid::new("88427").show(ui, |ui| {
+            egui::Grid::new("88427").spacing([0.0,7.0]).show(ui, |ui| {
                 
-                ui.label("Izberi lokacijo, kjer shranjujem videje: ");
-                if ui.button("Izberi").clicked() {
-                    if let Some(path) = rfd::FileDialog::new().pick_folder() {
-                        ytapp.PotDoVideo = Some(path.display().to_string());
+                ui.vertical_centered(|ui|{
+                    ui.label("Izberi lokacijo, kjer shranjujem videje: ");
+                    if ui.button("Izberi").clicked() {
+                        if let Some(path) = rfd::FileDialog::new().pick_folder() {
+                            ytapp.PotDoVideo = Some(path.display().to_string());
+                        }
                     }
-                }
+                });
+            
                 ui.end_row();
 
                 //Izpiše pot do datoteke
                 if let Some(pot) = &ytapp.PotDoVideo {
-                    ui.label("Izbrana lokacija:");
-                    ui.monospace(pot);
+                    ui.horizontal_centered(|ui|{
+                        ui.label("Izbrana lokacija:");
+                        ui.monospace(pot);
+                    });              
                 }
 
                 ui.end_row();
@@ -359,6 +365,54 @@ pub fn DodajIzgledInFunkcionalnostZaDruge(ytapp: &mut YTApp, ctx: &egui::Context
 
     // endregion
 
+    // region: Audio Lokacija okno
+    if ytapp.NastavitveLokacijaAudioEvent.kliknjen {            
+        //Ustvari novo okno in v njega da možnosti za nastavit
+        egui::Window::new(RichText::new("Lokacija Audio").size(20.0))
+        .min_width(200.0)
+        .min_height(100.0)
+        .default_pos([100.0, 100.0])
+        .collapsible(false)
+        .resizable(false)
+        .open(&mut ytapp.PrikaziNastavitveLokacijaAudioiUI).show(ctx, |ui| {    
+
+            //Postavi v grid zato da sta v eni vrstici
+            egui::Grid::new("88427").spacing([0.0,7.0]).show(ui, |ui| {
+                
+                ui.vertical_centered(|ui|{
+                    ui.label("Izberi lokacijo, kjer shranjujem audio: ");
+                    if ui.button("Izberi").clicked() {
+                        if let Some(path) = rfd::FileDialog::new().pick_folder() {
+                            ytapp.PotDoAudio = Some(path.display().to_string());
+                        }
+                    }
+                });
+                ui.end_row();
+
+                //Izpiše pot do datoteke
+                if let Some(pot) = &ytapp.PotDoAudio {
+                    ui.horizontal_centered(|ui|{
+                        ui.label("Izbrana lokacija:");
+                        ui.monospace(pot);
+                    });
+                    
+                }
+
+                ui.end_row();
+            });
+        
+
+        });
+
+        
+
+    }
+    
+    if ytapp.PrikaziNastavitveLokacijaAudioiUI == false{
+        ytapp.NastavitveLokacijaAudioEvent.kliknjen = false;
+    }
+
+    // endregion
 
     // endregion
 }

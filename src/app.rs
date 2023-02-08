@@ -20,7 +20,7 @@ pub struct YTApp {
     pub age: u32,
     pub PotDoYTDLP: Option<String>,
     pub PotDoVideo: Option<String>,
-    
+    pub PotDoAudio: Option<String>,
 
     //Kar se ne rabi shraniti
 
@@ -45,6 +45,10 @@ pub struct YTApp {
     pub PrikaziNastavitveLokacijaVidejiUI: bool,
     #[serde(skip)]
     pub NastavitveLokacijaVidejiEvent: GumbEvent,
+    #[serde(skip)]
+    pub PrikaziNastavitveLokacijaAudioiUI: bool,
+    #[serde(skip)]
+    pub NastavitveLokacijaAudioEvent: GumbEvent,
 
     //Central-Panel
     #[serde(skip)]
@@ -86,6 +90,7 @@ impl Default for YTApp {
             age: 42,
             PotDoYTDLP: None,
             PotDoVideo: None,
+            PotDoAudio: None,
             IDjiZaNapakaWindow: Vec::from([64345, 38015, 41661, 32302, 35660, 64159, 48057, 12441, 15910, 48957, 
                 30690, 29088, 22894, 54035, 19348, 34923, 59481, 45316, 46313, 50076]),
             TextureNapaka: None,           
@@ -98,6 +103,8 @@ impl Default for YTApp {
             NastavitveYTDLPEvent: GumbEvent { kliknjen: false },
             PrikaziNastavitveLokacijaVidejiUI: true,
             NastavitveLokacijaVidejiEvent: GumbEvent { kliknjen: false},
+            PrikaziNastavitveLokacijaAudioiUI: true,
+            NastavitveLokacijaAudioEvent: GumbEvent { kliknjen: false},
 
             //Central-Panel
             CPPosljiEvent: GumbEvent { kliknjen: false },

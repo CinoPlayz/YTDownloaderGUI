@@ -25,6 +25,12 @@ pub fn DodajIzgled(ytapp: &mut YTApp, ui: &mut Ui, frame: &mut Frame){
             ytapp.PrikaziNastavitveLokacijaVidejiUI = true;
         }
 
+          //Pot za shranjevanje videjev
+          if ui.button("Lokacija Audio").clicked() {
+            ytapp.NastavitveLokacijaAudioEvent.kliknjen = true;
+            ytapp.PrikaziNastavitveLokacijaAudioiUI = true;
+        }
+
  
       
     });
