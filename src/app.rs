@@ -66,9 +66,15 @@ pub struct YTApp {
     #[serde(skip)]
     pub IzbranFormat: Format,
     #[serde(skip)]
-    pub Kategorije: Vec<String>,
+    pub KategorijeVideo: Vec<String>,
+    #[serde(skip)]
+    pub KategorijeAudio: Vec<String>,
     #[serde(skip)]
     pub IzbranKategorija: String,
+    #[serde(skip)]
+    pub IzbranZanra: String,
+    #[serde(skip)]
+    pub Tip: String,
 
 
 }
@@ -103,8 +109,11 @@ impl Default for YTApp {
             //Funkcionalnost
             Formati: Vec::new(),
             IzbranFormat: Format { ..Default::default()},
-            Kategorije: Vec::new(),
-            IzbranKategorija: String::new(),
+            KategorijeVideo: Vec::new(),
+            KategorijeAudio: Vec::new(),
+            IzbranKategorija: String::from("Ostalo"),
+            IzbranZanra: String::from("Ostalo"),
+            Tip: String::from("Video"),
             
         }
     }
@@ -176,7 +185,7 @@ impl eframe::App for YTApp {
         egui::CentralPanel::default().show(ctx, |ui| {
             
             DeliZaslona::central_panel::DodajIzgled(self, ui);
-            DeliZaslona::central_panel::DodajFunkcionalnost(self, ctx);
+            DeliZaslona::central_panel::DodajFunkcionalnost(self);
 
             
       

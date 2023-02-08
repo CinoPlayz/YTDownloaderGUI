@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 pub struct GumbEvent{
     pub kliknjen: bool,
 }
@@ -5,6 +6,11 @@ pub struct GumbEvent{
 pub struct PrejetoEvent{
     pub aktivno: bool,
     pub napaka: bool,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Kategorije{
+    pub Kategorije: Vec<String>,
 }
 
 impl Default for PrejetoEvent{
