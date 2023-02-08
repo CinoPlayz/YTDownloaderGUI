@@ -65,6 +65,10 @@ pub struct YTApp {
     pub Formati: Vec<Format>,
     #[serde(skip)]
     pub IzbranFormat: Format,
+    #[serde(skip)]
+    pub Kategorije: Vec<String>,
+    #[serde(skip)]
+    pub IzbranKategorija: String,
 
 
 }
@@ -98,7 +102,10 @@ impl Default for YTApp {
 
             //Funkcionalnost
             Formati: Vec::new(),
-            IzbranFormat: Format { ID:"".to_string(), VideoFormat:"".to_string(), Rezolucija:"".to_string() }
+            IzbranFormat: Format { ..Default::default()},
+            Kategorije: Vec::new(),
+            IzbranKategorija: String::new(),
+            
         }
     }
 }

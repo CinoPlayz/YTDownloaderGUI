@@ -115,8 +115,7 @@ pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp, _ctx: &egui::Context){
                             if video_format.contains("av01"){ video_format= "AV1".to_string();}
                             else if video_format.contains("avc"){ video_format= "AVC".to_string();}
                             else if video_format.contains("vp9"){ video_format= "VP9".to_string();}
-                            
-                            //ytapp.Formati.push(Format { ID: format["format_id"].to_string(), VideoFormat: format["vcodec"].to_string(), Rezolucija: format["resolution"].to_string() })
+
                             ytapp.Formati.push(Format { ID: id, VideoFormat: video_format, Rezolucija: rezolucija });
                         }
                     }
@@ -133,5 +132,11 @@ pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp, _ctx: &egui::Context){
         Err(_) => {
         },
     }
+    
+}
+
+
+
+pub fn NaloziKategorije(ytapp: &mut YTApp){
     
 }

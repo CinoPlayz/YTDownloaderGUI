@@ -22,3 +22,13 @@ pub struct Format{
     pub VideoFormat: String,    
     pub Rezolucija: String,
 }
+
+impl Default for Format{
+    fn default() -> Self {
+        Format { 
+            ID: "".to_string(), 
+            VideoFormat: "".to_string(), 
+            Rezolucija: "".to_string()
+        }
+    }
+}
