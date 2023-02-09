@@ -9,6 +9,8 @@ use std::os::windows::process::CommandExt;
 use serde_json::{Value};
 use std::fs::File;
 
+use super::skupno::Pretvori_Non_Ascii;
+
 
 const CREATE_NO_WINDOW: u32 = 0x08000000;
 
@@ -87,6 +89,7 @@ pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp){
             //Preveri če je bila kakšna napaka
             if prvi_4 != "[ok]" {
                 ytapp.CPPosljiPrejeto.napaka = true;
+                ytapp.CPPosljiEvent.kliknjen = false;
                 
                 ytapp.PrikaziNapakoUI = true;
                 ytapp.IzpisujNapako = true;
@@ -122,6 +125,10 @@ pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp){
                         }
                     }
                 }
+
+                //Dobi ime kanala v ascii obliki
+                ytapp.YTKanal = Pretvori_Non_Ascii(v["channel"].to_string());
+            
 
                 //Nalozi Kategorije v spremeljivko, če še nikoli niso bile
                 if ytapp.KategorijeAudio.is_empty() || ytapp.KategorijeVideo.is_empty() {

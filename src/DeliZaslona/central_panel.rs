@@ -1,17 +1,17 @@
 use egui::Ui;
 use egui::RichText;
 use egui::style::Margin;
+use crate::Funkcionalnost::prenesi_video::OdpriDatoteko;
+use crate::Funkcionalnost::prenesi_video::OdpriMapo;
 use crate::app::YTApp;
 use crate::Funkcionalnost;
 use crate::structs::PrejetoEvent;
 use crate::Funkcionalnost::skupno::IzpisiNapako;
-use crate::Funkcionalnost::skupno::Pretvori_Non_Ascii;
 
 pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
     //Centrira elemente
     ui.vertical_centered(|ui| {
 
-        Pretvori_Non_Ascii("a̐ŽžŻżĈĉČčŐőØøŒœ".to_string());
         //Preveri če mora izpisovati napako
         if ytapp.PrikaziNapakoUI == false{
             ytapp.IzpisujNapako = false;
@@ -36,6 +36,7 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
             if ui.button("Pošlji").clicked(){
                 ytapp.CPPosljiEvent.kliknjen = true;
                 ytapp.CPPrikazujSpinner = true;
+                ytapp.ImeDatoteke = String::new();
             }
         });
       
@@ -289,6 +290,7 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
             // region: Prenos
             if ui.button("Prenesi").clicked(){
                 ytapp.CPPrenosEvent.kliknjen = true;
+                ytapp.ImeDatoteke = String::new();
             }
 
             // endregion
@@ -296,10 +298,27 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
          
         }
 
-
-        if ytapp.CPPrenosEvent.kliknjen == true {
-            
+        //Preveri če se prenaša
+        if ytapp.CPPrenosPrejeto.aktivno == true && ytapp.CPPrenosPrejeto.napaka == false {
+            ui.add(egui::widgets::ProgressBar::show_percentage(egui::widgets::ProgressBar::new(ytapp.CPProcenti)));
+            ui.label(&ytapp.CPCasPrenos);
         }
+
+        //Preveri če je prenesena datoteka
+        if !ytapp.ImeDatoteke.is_empty() {
+            ui.label("Preneseno:");
+            if ui.button("Odpri").clicked() {
+                println!("{}", ytapp.ImeDatoteke);
+                OdpriDatoteko(ytapp);
+            }
+
+            if ui.button("Odpri mapo").clicked() {
+                println!("{}", ytapp.ImeDatoteke);
+                OdpriMapo(ytapp);
+            }
+        }
+
+
 
     });
     
@@ -313,7 +332,7 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
 }
 
 
-pub fn DodajFunkcionalnost(ytapp: &mut YTApp){
+pub fn DodajFunkcionalnost(ytapp: &mut YTApp, ctx: &egui::Context){
 
     //Če je bil kliknjen gumb za pridobivanje informacij o videju
     if ytapp.CPPosljiEvent.kliknjen == true{
@@ -326,12 +345,13 @@ pub fn DodajFunkcionalnost(ytapp: &mut YTApp){
     }
 
     //Če je bil kliknjen gumb za prenos videju
-    if ytapp.CPPosljiEvent.kliknjen == true{
-        //Nastavi struct posljiprejeto na prevzete vrednosti
-        ytapp.CPPosljiPrejeto = PrejetoEvent{ ..Default::default()};
+    if ytapp.CPPrenosEvent.kliknjen == true{
 
         //Prenese video
         Funkcionalnost::prenesi_video::Prenesi_Video(ytapp);  
+
+        //Refreša tako dolgo dokler ni konec s prenosom
+        ctx.request_repaint();
   
     }
     

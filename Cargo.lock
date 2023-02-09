@@ -10,6 +10,7 @@ dependencies = [
  "eframe",
  "egui",
  "image",
+ "regex",
  "rfd",
  "serde",
  "serde_json",

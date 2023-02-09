@@ -69,6 +69,10 @@ pub struct YTApp {
     pub CPReisiverPrenos: Receiver<String>,  
     #[serde(skip)]
     pub CPReisiverPrenosPoln: bool,
+    #[serde(skip)]
+    pub CPProcenti: f32,
+    #[serde(skip)]
+    pub CPCasPrenos: String,
 
 
 
@@ -91,6 +95,10 @@ pub struct YTApp {
     pub IzbranVrsta: String,
     #[serde(skip)]
     pub Tip: String,
+    #[serde(skip)]
+    pub YTKanal: String,
+    #[serde(skip)]
+    pub ImeDatoteke: String,
 
 
 }
@@ -128,6 +136,8 @@ impl Default for YTApp {
             CPPrenosPrejeto: PrejetoEvent {..Default::default() },
             CPReisiverPrenos: mpsc::channel().1,
             CPReisiverPrenosPoln: false,  
+            CPProcenti: 0.0,
+            CPCasPrenos: "".to_string(),
 
             //Funkcionalnost
             Formati: Vec::new(),
@@ -139,6 +149,8 @@ impl Default for YTApp {
             IzbranZanra: String::from("Ostalo"),
             IzbranVrsta: String::from("wav"),
             Tip: String::from("Video"),
+            YTKanal: String::new(),
+            ImeDatoteke: String::new(),
             
         }
     }
@@ -210,7 +222,7 @@ impl eframe::App for YTApp {
         egui::CentralPanel::default().show(ctx, |ui| {
             
             DeliZaslona::central_panel::DodajIzgled(self, ui);
-            DeliZaslona::central_panel::DodajFunkcionalnost(self);
+            DeliZaslona::central_panel::DodajFunkcionalnost(self, ctx);
 
             
       

@@ -130,6 +130,10 @@ pub fn Pretvori_Non_Ascii(string: String) -> String{
         
     }
 
+    if ascii_string.is_empty(){
+        ascii_string = "Neznano".to_string();
+    }
+
     return  ascii_string;
 
 }
