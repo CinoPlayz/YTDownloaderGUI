@@ -6,6 +6,7 @@ pub struct GumbEvent{
 pub struct PrejetoEvent{
     pub aktivno: bool,
     pub napaka: bool,
+    pub sporocilo: String,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -17,7 +18,8 @@ impl Default for PrejetoEvent{
     fn default() -> Self {
         PrejetoEvent { 
             aktivno: false, 
-            napaka: false 
+            napaka: false,
+            sporocilo: "".to_string()
         }
     }
 }

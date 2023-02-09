@@ -60,7 +60,15 @@ pub struct YTApp {
     #[serde(skip)]
     pub CPReisiverJSON: Receiver<String>,
     #[serde(skip)]
-    pub CPReisiverJSONPoln: bool,
+    pub CPReisiverJSONPoln: bool,    
+    #[serde(skip)]
+    pub CPPrenosEvent: GumbEvent,
+    #[serde(skip)]
+    pub CPPrenosPrejeto: PrejetoEvent,
+    #[serde(skip)]
+    pub CPReisiverPrenos: Receiver<String>,  
+    #[serde(skip)]
+    pub CPReisiverPrenosPoln: bool,
 
 
 
@@ -74,9 +82,13 @@ pub struct YTApp {
     #[serde(skip)]
     pub KategorijeAudio: Vec<String>,
     #[serde(skip)]
+    pub VrstaDatotek: Vec<String>,
+    #[serde(skip)]
     pub IzbranKategorija: String,
     #[serde(skip)]
     pub IzbranZanra: String,
+    #[serde(skip)]
+    pub IzbranVrsta: String,
     #[serde(skip)]
     pub Tip: String,
 
@@ -111,15 +123,21 @@ impl Default for YTApp {
             CPPosljiPrejeto: PrejetoEvent {..Default::default() },
             CPPrikazujSpinner: false,
             CPReisiverJSON: mpsc::channel().1,
-            CPReisiverJSONPoln: false,
+            CPReisiverJSONPoln: false,            
+            CPPrenosEvent: GumbEvent { kliknjen: false },
+            CPPrenosPrejeto: PrejetoEvent {..Default::default() },
+            CPReisiverPrenos: mpsc::channel().1,
+            CPReisiverPrenosPoln: false,  
 
             //Funkcionalnost
             Formati: Vec::new(),
             IzbranFormat: Format { ..Default::default()},
             KategorijeVideo: Vec::new(),
             KategorijeAudio: Vec::new(),
+            VrstaDatotek: Vec::from(["wav".to_string(), "mp3".to_string(), "m4a".to_string(), "aac".to_string()]),
             IzbranKategorija: String::from("Ostalo"),
             IzbranZanra: String::from("Ostalo"),
+            IzbranVrsta: String::from("wav"),
             Tip: String::from("Video"),
             
         }

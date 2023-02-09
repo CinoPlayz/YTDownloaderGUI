@@ -5,11 +5,13 @@ use crate::app::YTApp;
 use crate::Funkcionalnost;
 use crate::structs::PrejetoEvent;
 use crate::Funkcionalnost::skupno::IzpisiNapako;
+use crate::Funkcionalnost::skupno::Pretvori_Non_Ascii;
 
 pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
     //Centrira elemente
     ui.vertical_centered(|ui| {
 
+        Pretvori_Non_Ascii("a̐ŽžŻżĈĉČčŐőØøŒœ".to_string());
         //Preveri če mora izpisovati napako
         if ytapp.PrikaziNapakoUI == false{
             ytapp.IzpisujNapako = false;
@@ -206,36 +208,97 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
             }
             else{
                 // region: Audio Izbira
-                //Žanra                 
-                ui.label("Žanra:");
-
-                let margin_zanra =  (ui.ctx().used_size()[0] - 175.0) / 2.0;
+                let margin_zanra =  (ui.ctx().used_size()[0] - 355.0) / 2.0;
                 let margin_zanra_struct = Margin{left: margin_zanra, right: 0.0, top: 0.0, bottom: 30.0};
+                
 
                 egui::Frame::none()
                 .inner_margin(margin_zanra_struct)
-                .show(ui, |ui|{                
-                egui::ComboBox::from_id_source("Izberi Zanro!")
-                    .selected_text(format!("{}", ytapp.IzbranZanra))
-                    .width(155.0)                
-                    .show_ui(ui, |ui| {
+                .show(ui, |ui|{
+                    
+                    egui::Grid::new("71392")
+                    .spacing([20.0, 3.0])                
+                    .show(ui, |ui| {
+                        
+                        ui.vertical_centered(|ui|{
+                            ui.label("Žanra:");
+                        });
 
-                        let dolzina = ytapp.KategorijeAudio.len();
+                        ui.vertical_centered(|ui|{
+                            ui.label("Vrsta Datoteke:");
+                        });
+                    
 
-                        //Izpiše vse kodeke na izbiro
-                        for i in 0..dolzina{
-                            ui.selectable_value( &mut ytapp.IzbranZanra,  ytapp.KategorijeAudio[i].clone(), &ytapp.KategorijeAudio[i]);
-                            
-                        }
+                        ui.end_row();
 
-                    });
-            
+
+
+                      
+                        egui::Frame::none()                        
+                        .show(ui, |ui|{       
+                            //Žanra         
+                            egui::ComboBox::from_id_source("Izberi Zanro!")
+                            .selected_text(format!("{}", ytapp.IzbranZanra))
+                            .width(155.0)                
+                            .show_ui(ui, |ui| {
+        
+                                let dolzina = ytapp.KategorijeAudio.len();
+        
+                                //Izpiše vse kodeke na izbiro
+                                for i in 0..dolzina{
+                                    ui.selectable_value( &mut ytapp.IzbranZanra,  ytapp.KategorijeAudio[i].clone(), &ytapp.KategorijeAudio[i]);
+                                    
+                                }
+        
+                            });
+                    
+                        });
+
+                        egui::Frame::none()
+                        .show(ui, |ui|{
+                            //Vrsta
+                            egui::ComboBox::from_id_source("Izberi Koncna vrsta!")
+                            .selected_text(format!("{}", ytapp.IzbranVrsta))
+                            .width(155.0)                
+                            .show_ui(ui, |ui| {
+                                
+                                let dolzina = ytapp.VrstaDatotek.len();
+        
+                                //Izpiše vse kodeke na izbiro
+                                for i in 0..dolzina{
+                                    ui.selectable_value( &mut ytapp.IzbranVrsta,  ytapp.VrstaDatotek[i].clone(), &ytapp.VrstaDatotek[i]);
+                                    
+                                }
+        
+                            });
+                        });
+
+
+                        ui.end_row();
+                    }); 
                 });
+                                
+                
+
+     
 
                 // endregion
             }
 
+
+            // region: Prenos
+            if ui.button("Prenesi").clicked(){
+                ytapp.CPPrenosEvent.kliknjen = true;
+            }
+
+            // endregion
+
          
+        }
+
+
+        if ytapp.CPPrenosEvent.kliknjen == true {
+            
         }
 
     });
@@ -259,6 +322,16 @@ pub fn DodajFunkcionalnost(ytapp: &mut YTApp){
 
         //Pridobi informacije o videju
         Funkcionalnost::podatki_video::PridobiPodatkeOdVideja(ytapp);  
+  
+    }
+
+    //Če je bil kliknjen gumb za prenos videju
+    if ytapp.CPPosljiEvent.kliknjen == true{
+        //Nastavi struct posljiprejeto na prevzete vrednosti
+        ytapp.CPPosljiPrejeto = PrejetoEvent{ ..Default::default()};
+
+        //Prenese video
+        Funkcionalnost::prenesi_video::Prenesi_Video(ytapp);  
   
     }
     
