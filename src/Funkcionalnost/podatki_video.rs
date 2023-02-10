@@ -116,12 +116,13 @@ pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp){
                             let id = format["format_id"].to_string().replace("\"", "");
                             let mut video_format = format["vcodec"].to_string().replace("\"", "");
                             let rezolucija = format["resolution"].to_string().replace("\"", "");
+                            let ext_format = format["video_ext"].to_string().replace("\"", "");
 
                             if video_format.contains("av01"){ video_format= "AV1".to_string();}
                             else if video_format.contains("avc"){ video_format= "AVC".to_string();}
                             else if video_format.contains("vp9"){ video_format= "VP9".to_string();}
 
-                            ytapp.Formati.push(Format { ID: id, VideoFormat: video_format, Rezolucija: rezolucija });
+                            ytapp.Formati.push(Format { ID: id, VideoFormat: video_format, Rezolucija: rezolucija, ExtFormat: ext_format });
                         }
                     }
                 }

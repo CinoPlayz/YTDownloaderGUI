@@ -3,7 +3,7 @@ use crate::structs::PrejetoEvent;
 
 use std::env;
 use std::io::{BufReader, BufRead};
-use std::process::{Command, Stdio};
+use std::process::{Command, Stdio, Child};
 use std::sync::mpsc::{self, Sender, Receiver};
 use std::thread;
 use std::os::windows::process::CommandExt;
@@ -23,6 +23,18 @@ pub fn Prenesi_Video(ytapp: &mut YTApp){
         ytapp.CPReisiverPrenos = receiver;
         ytapp.CPReisiverPrenosPoln = true;
 
+        //Preveri, če je mp4, izbran tudi tak kodek, ki se pretvori v mp4
+        let mut napaka_prej = false;
+        if ytapp.MP4{
+            if ytapp.IzbranFormat.ExtFormat != "mp4"{
+                napaka_prej = true;
+                match sender.send("Izberi kodek, ki podpira mp4".to_string()){
+                    Ok(_) => {},
+                    Err(e) => {println!("{}", e)},
+                } 
+            }
+        }
+
         //Preveri da je pot do video nastavljena
         if !ytapp.PotDoVideo.is_some() {
             match sender.send("Izberi lokacijo za shranjevanje videjev".to_string()){
@@ -31,118 +43,134 @@ pub fn Prenesi_Video(ytapp: &mut YTApp){
             } 
         } 
         else{
-            //Določi pot do videja
-            let mut PotDoVideo = ytapp.PotDoVideo.as_ref().unwrap().clone();
-            if PotDoVideo.contains('/'){PotDoVideo.push('/')} else {PotDoVideo.push('\\')} 
-            PotDoVideo.push_str(&ytapp.IzbranKategorija);
-            if PotDoVideo.contains('/'){PotDoVideo.push('/')} else {PotDoVideo.push('\\')} 
-            PotDoVideo.push_str(&ytapp.YTKanal);
+            if !napaka_prej{
+                //Določi pot do videja
+                let mut PotDoVideo = ytapp.PotDoVideo.as_ref().unwrap().clone();
+                if PotDoVideo.contains('/'){PotDoVideo.push('/')} else {PotDoVideo.push('\\')} 
+                PotDoVideo.push_str(&ytapp.IzbranKategorija);
+                if PotDoVideo.contains('/'){PotDoVideo.push('/')} else {PotDoVideo.push('\\')} 
+                PotDoVideo.push_str(&ytapp.YTKanal);
 
-            let FormatID = ytapp.IzbranFormat.ID.clone();
+                let FormatID = ytapp.IzbranFormat.ID.clone();
+                let JeMP4 = ytapp.MP4.clone();
 
 
-            //Zažene nov thread, kjer izvede postopek za prenos
-            thread::spawn(move|| {
+                //Zažene nov thread, kjer izvede postopek za prenos
+                thread::spawn(move|| {
 
-                let mut sporocilo = String::new();
+                    let mut sporocilo = String::new();
 
-                //Nastavi env pot tam kjer je yt-dlp
-                match env::set_current_dir(&PotDoYTDLP){
-                    Err(_) => {sporocilo = "Izberi pot do YT-DLP".to_string();},
-                    Ok(_) => {
-                        let FormatPrenos = format!("{}+ba", FormatID);
+                    //Nastavi env pot tam kjer je yt-dlp
+                    match env::set_current_dir(&PotDoYTDLP){
+                        Err(_) => {sporocilo = "Izberi pot do YT-DLP".to_string();},
+                        Ok(_) => {
+                            let FormatPrenos = format!("{}+ba", FormatID);
 
-                        let ruslt_otrok = Command::new("powershell")
-                        .args([r".\yt-dlp.exe", "-f", &FormatPrenos, "-P", &PotDoVideo, &URL, "--embed-thumbnail", "--restrict-filenames"])
-                        .creation_flags(CREATE_NO_WINDOW)
-                        .stdout(Stdio::piped())
-                        .spawn();
+                            let ruslt_otrok: Result<Child, std::io::Error>;
 
-                        match ruslt_otrok {
-                            //Preveri če je vredu napisan command
-                            Ok(otrok) => {
-                                match otrok.stdout {
-                                    Some(stdout) => {
+                            if JeMP4 {
+                                ruslt_otrok = Command::new("powershell")
+                                .args([r".\yt-dlp.exe", "-f", &FormatPrenos, "-P", &PotDoVideo, "-S res,ext:mp4:m4a --recode mp4", &URL, "--embed-thumbnail", "--restrict-filenames"])
+                                .creation_flags(CREATE_NO_WINDOW)
+                                .stdout(Stdio::piped())
+                                .spawn();
+                            }
+                            else{
+                                ruslt_otrok = Command::new("powershell")
+                                .args([r".\yt-dlp.exe", "-f", &FormatPrenos, "-P", &PotDoVideo, &URL, "--embed-thumbnail", "--restrict-filenames"])
+                                .creation_flags(CREATE_NO_WINDOW)
+                                .stdout(Stdio::piped())
+                                .spawn();
+                            }
+                          
 
-                                        //Ustvari se nov BufReader v katerega se zapišejo podatki iz stdout
-                                        let stdout_reader = BufReader::new(stdout);
-                        
-                                        //Razdeli kar je BufReaderju v to da se izpiše vsaka posodobitev commandlina in da rezultate v array vrednost, ki obstaja 
-                                        let stdout_lines2 = stdout_reader.split(b'\r');
+                            match ruslt_otrok {
+                                //Preveri če je vredu napisan command
+                                Ok(otrok) => {
+                                    match otrok.stdout {
+                                        Some(stdout) => {
 
-                                        //Gre čez linije, ki se prikažejo v powershellu preveri da niso prazne in jih pošlje po channelju
-                                        for line in stdout_lines2 {
-                                            match line{
-                                                Ok(podatek) => {
-                                                    //Sestavi sporocilo
-                                                    sporocilo = String::from("[ok]");
-                                                    let podatek_string = String::from_utf8_lossy(&podatek).to_string();
-                                                    
-                                                    //Preveri če je prenos z števili                                                    
-                                                    let regex = Regex::new(r":\d\d$").unwrap();
+                                            //Ustvari se nov BufReader v katerega se zapišejo podatki iz stdout
+                                            let stdout_reader = BufReader::new(stdout);
+                            
+                                            //Razdeli kar je BufReaderju v to da se izpiše vsaka posodobitev commandlina in da rezultate v array vrednost, ki obstaja 
+                                            let stdout_lines2 = stdout_reader.split(b'\r');
 
-                                                    
-                                                    if regex.is_match(&podatek_string){
+                                            //Gre čez linije, ki se prikažejo v powershellu preveri da niso prazne in jih pošlje po channelju
+                                            for line in stdout_lines2 {
+                                                match line{
+                                                    Ok(podatek) => {
+                                                        //Sestavi sporocilo
+                                                        sporocilo = String::from("[ok]");
+                                                        let podatek_string = String::from_utf8_lossy(&podatek).to_string();
+                                                        
+                                                        //Preveri če je prenos z števili                                                    
+                                                        let regex = Regex::new(r":\d\d$").unwrap();
 
-                                                        let mut counter = 0;
-                                                        let mut procent = String::new();
-                                                        let mut cas = String::new();
-    
-                                                        for beseda in podatek_string.split_whitespace(){
-                                                            counter += 1;
-    
-                                                            //Dobi drugo besedo iz tega stringa (ostanek)
-                                                            if counter == 2 {
-                                                                procent = beseda.to_string();
+                                                        
+                                                        if regex.is_match(&podatek_string){
+
+                                                            let mut counter = 0;
+                                                            let mut procent = String::new();
+                                                            let mut cas = String::new();
+        
+                                                            for beseda in podatek_string.split_whitespace(){
+                                                                counter += 1;
+        
+                                                                //Dobi drugo besedo iz tega stringa (ostanek)
+                                                                if counter == 2 {
+                                                                    procent = beseda.to_string();
+                                                                }
+        
+                                                                //Dobi vse zadnje besede (hitrost in cas)
+                                                                if counter > 5 {
+                                                                    cas.push_str(beseda);
+                                                                    cas.push(' ');
+                                                                }
                                                             }
-    
-                                                            //Dobi vse zadnje besede (hitrost in cas)
-                                                            if counter > 5 {
-                                                                cas.push_str(beseda);
-                                                                cas.push(' ');
-                                                            }
+        
+                                                            sporocilo.push_str(format!("[prenos]{}|{}", procent, cas).as_str());
+                                                            
+                                                            
                                                         }
-    
-                                                        sporocilo.push_str(format!("[prenos]{}|{}", procent, cas).as_str());
-                                                        
-                                                        
-                                                    }
-                                                    else{
-                                                        sporocilo.push_str(&podatek_string);
-                                                    }
-                                                   
+                                                        else{
+                                                            sporocilo.push_str(&podatek_string);
+                                                        }
+                                                    
 
-                                                    //Poslje sporocilo
-                                                    match sender.send(sporocilo.clone()){
-                                                        Ok(_) => {},
-                                                        Err(e) => {println!("{}", e)},
-                                                    } 
+                                                        //Poslje sporocilo
+                                                        match sender.send(sporocilo.clone()){
+                                                            Ok(_) => {},
+                                                            Err(e) => {println!("{}", e)},
+                                                        } 
 
-                                                },
-                                                Err(e) => eprintln!("Nekaj narobe s podatkom: {}", e),
+                                                    },
+                                                    Err(e) => eprintln!("Nekaj narobe s podatkom: {}", e),
+                                                }
+                                            
+                                            
                                             }
-                                           
-                                        
+                                            
                                         }
-                                          
+                                        None => println!("Napaka pri otroku")
                                     }
-                                    None => println!("Napaka pri otroku")
-                                }
-                              
-                            },
-                            Err(e) => {
-                                sporocilo = e.to_string();
-                            },
-                        } 
+                                
+                                },
+                                Err(e) => {
+                                    sporocilo = e.to_string();
+                                },
+                            } 
+                        }
+                        
                     }
-                    
-                }
 
-                match sender.send(sporocilo){
-                    Ok(_) => {},
-                    Err(e) => {println!("{}", e)},
-                }  
-            });
+                    match sender.send(sporocilo){
+                        Ok(_) => {},
+                        Err(e) => {println!("{}", e)},
+                    }  
+                });
+            }
+            
         }
         
     }
@@ -197,17 +225,51 @@ pub fn Prenesi_Video(ytapp: &mut YTApp){
                 }
                 //Dobi ime datoteke in konec prenosa
                 else if sporocilo.contains("[Merger] Merging formats into \"") {
-                    ytapp.CPPrenosEvent.kliknjen = false;
-                    ytapp.CPReisiverPrenosPoln = false;
-                    ytapp.CPPrenosPrejeto = PrejetoEvent{ ..Default::default()};
+                    //Preveri če je res konec ali se mora pretvoriti v mp4
+                    if !ytapp.MP4{
+                        ytapp.CPPrenosEvent.kliknjen = false;
+                        ytapp.CPReisiverPrenosPoln = false;
+                        ytapp.CPPrenosPrejeto = PrejetoEvent{ ..Default::default()};
 
-                    //Dobi podatke od "
-                    sporocilo.drain(..sporocilo.find("[Merger] Merging formats into \"").unwrap()+31);
-                    
+                        //Dobi podatke od "
+                        sporocilo.drain(..sporocilo.find("[Merger] Merging formats into \"").unwrap()+31);
+                        
 
-                    sporocilo.truncate(sporocilo.find('"').unwrap());    
+                        sporocilo.truncate(sporocilo.find('"').unwrap());    
+                        
+                        ytapp.ImeDatoteke = sporocilo;
+                    }
+                    else{
+                        //Preveri če je bilo že preneseno v formatu mp4
+                        if sporocilo.contains("[VideoConvertor] Not converting media file \""){
+                            ytapp.CPPrenosEvent.kliknjen = false;
+                            ytapp.CPReisiverPrenosPoln = false;
+                            ytapp.CPPrenosPrejeto = PrejetoEvent{ ..Default::default()};
+    
+                            //Dobi podatke od "
+                            sporocilo.drain(..sporocilo.find("[VideoConvertor] Not converting media file \"").unwrap()+44);
+                            sporocilo.truncate(sporocilo.find('"').unwrap());    
+                            ytapp.ImeDatoteke = sporocilo;
+                        }
+                        else{
+                            ytapp.CPPrenosEvent.kliknjen = false;
+                            ytapp.CPReisiverPrenosPoln = false;
+                            ytapp.CPPrenosPrejeto = PrejetoEvent{ ..Default::default()};
+
+                            let PotDoVideo = ytapp.PotDoVideo.as_ref().unwrap().clone();
+
+                            if PotDoVideo.contains('/') {
+                                ytapp.ImeDatoteke = format!("{}/{}/{}", &PotDoVideo, ytapp.IzbranKategorija, ytapp.YTKanal);
+                            }
+                            else{
+                                ytapp.ImeDatoteke = format!("{}\\{}\\{}", &PotDoVideo, ytapp.IzbranKategorija, ytapp.YTKanal);
+                            }
+                            
+                            println!("Sporocilo:   {}", sporocilo);
+                        }
+                        
+                    }
                     
-                    ytapp.ImeDatoteke = sporocilo;
 
                 }
                 else if sporocilo.contains(" has already been downloaded"){

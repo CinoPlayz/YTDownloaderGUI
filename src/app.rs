@@ -99,6 +99,8 @@ pub struct YTApp {
     pub YTKanal: String,
     #[serde(skip)]
     pub ImeDatoteke: String,
+    #[serde(skip)]
+    pub MP4: bool,
 
 
 }
@@ -151,6 +153,7 @@ impl Default for YTApp {
             Tip: String::from("Video"),
             YTKanal: String::new(),
             ImeDatoteke: String::new(),
+            MP4: false,
             
         }
     }

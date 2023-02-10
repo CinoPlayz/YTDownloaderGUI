@@ -36,7 +36,10 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
             if ui.button("Pošlji").clicked(){
                 ytapp.CPPosljiEvent.kliknjen = true;
                 ytapp.CPPrikazujSpinner = true;
+                ytapp.CPReisiverPrenosPoln = false;
+                ytapp.CPPosljiPrejeto = PrejetoEvent{..Default::default()};
                 ytapp.ImeDatoteke = String::new();
+                ytapp.MP4 = false;
             }
         });
       
@@ -134,17 +137,36 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
                             .show_ui(ui, |ui| {
 
                                 let mut ze_dodani: Vec<String> = Vec::new();
-                        
-                                //Izpiše vse rezolucije, ki še niso bile
-                                for i in 0..dolzina{
 
-                                    if !ze_dodani.contains(&ytapp.Formati[i].Rezolucija){
-                                        ui.selectable_value( &mut ytapp.IzbranFormat,  ytapp.Formati[i].clone(), &ytapp.Formati[i].Rezolucija);
-                                        ze_dodani.push(ytapp.Formati[i].Rezolucija.clone());
+                                //Izpiše vse rezolucije, ki še niso bile, če je samo mp4
+                                if ytapp.MP4 {                                    
+                                    for i in 0..dolzina{
+                                        if !ze_dodani.contains(&ytapp.Formati[i].Rezolucija){
+
+                                            if ytapp.Formati[i].ExtFormat == "mp4"{
+                                                ui.selectable_value( &mut ytapp.IzbranFormat,  ytapp.Formati[i].clone(), &ytapp.Formati[i].Rezolucija);
+                                                ze_dodani.push(ytapp.Formati[i].Rezolucija.clone());
+                                            } 
+                                     
+                                            
+                                        }                                        
+                                    }
+                                }
+                                else{
+
+                                    //Izpiše vse rezolucije, ki še niso bile
+                                    for i in 0..dolzina{
+
+                                        if !ze_dodani.contains(&ytapp.Formati[i].Rezolucija){
+                                            ui.selectable_value( &mut ytapp.IzbranFormat,  ytapp.Formati[i].clone(), &ytapp.Formati[i].Rezolucija);
+                                            ze_dodani.push(ytapp.Formati[i].Rezolucija.clone());
+                                            
+                                        }
                                         
                                     }
-                                    
                                 }
+                        
+                             
                             }
                         );
                         });
@@ -159,13 +181,31 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
 
                             let dolzina = ytapp.Formati.len();
 
-                            //Izpiše vse kodeke na izbiro
-                            for i in 0..dolzina{
-                                if ytapp.Formati[i].Rezolucija == ytapp.IzbranFormat.Rezolucija {
-                                    ui.selectable_value( &mut ytapp.IzbranFormat,  ytapp.Formati[i].clone(), &ytapp.Formati[i].VideoFormat);
-                                }
+                            //Izpiše vse kodeke na izbiro, ki so za mp4
+                            if ytapp.MP4{
                                 
+                                for i in 0..dolzina{
+                                    if ytapp.Formati[i].Rezolucija == ytapp.IzbranFormat.Rezolucija {
+                                        if ytapp.Formati[i].ExtFormat == "mp4"{
+                                            ui.selectable_value( &mut ytapp.IzbranFormat,  ytapp.Formati[i].clone(), &ytapp.Formati[i].VideoFormat);
+                                        }
+                                        
+                                    }
+                                    
+                                }
                             }
+                            else{
+                                //Izpiše vse kodeke na izbiro
+                                for i in 0..dolzina{
+                                    if ytapp.Formati[i].Rezolucija == ytapp.IzbranFormat.Rezolucija {
+                                        ui.selectable_value( &mut ytapp.IzbranFormat,  ytapp.Formati[i].clone(), &ytapp.Formati[i].VideoFormat);
+                                    }
+                                    
+                                }
+                            }
+                           
+
+                            
 
                         });
                     
@@ -184,7 +224,7 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
 
                             let dolzina = ytapp.KategorijeVideo.len();
 
-                            //Izpiše vse kodeke na izbiro
+                            //Izpiše vse kategorije na izbiro
                             for i in 0..dolzina{
                                 ui.selectable_value( &mut ytapp.IzbranKategorija,  ytapp.KategorijeVideo[i].clone(), &ytapp.KategorijeVideo[i]);
                                                                 
@@ -202,10 +242,32 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
 
                 });
 
-                // endregion
+                
                 let leabel = format!("{}   {}   {}", &ytapp.IzbranFormat.ID, &ytapp.IzbranFormat.Rezolucija, &ytapp.IzbranFormat.VideoFormat);            
                 ui.label(leabel);
 
+                //MP4
+                egui::Frame::none()
+                .inner_margin(Margin{top: 20.0, bottom: 10.0, ..Default::default()})
+                .show(ui, |ui|{
+
+                    ui.vertical_centered(|ui|{
+                        ui.label("MP4:");
+                    });
+    
+                    egui::Frame::none()
+                    .inner_margin(Margin{left: (ui.ctx().used_size()[0] - 110.0) / 2.0, ..Default::default()})
+                    .show(ui, |ui|{    
+                        ui.horizontal(|ui|{                                
+                            ui.radio_value(&mut ytapp.MP4, true, "DA");
+                            ui.radio_value(&mut ytapp.MP4, false, "NE");
+                        });                    
+                    });
+                    
+                });
+
+                // endregion
+             
             }
             else{
                 // region: Audio Izbira
@@ -290,6 +352,8 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
             // region: Prenos
             if ui.button("Prenesi").clicked(){
                 ytapp.CPPrenosEvent.kliknjen = true;
+                ytapp.CPPrenosPrejeto = PrejetoEvent{..Default::default()};
+                ytapp.CPReisiverPrenosPoln = false;
                 ytapp.ImeDatoteke = String::new();
             }
 
@@ -308,12 +372,10 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
         if !ytapp.ImeDatoteke.is_empty() {
             ui.label("Preneseno:");
             if ui.button("Odpri").clicked() {
-                println!("{}", ytapp.ImeDatoteke);
                 OdpriDatoteko(ytapp);
             }
 
             if ui.button("Odpri mapo").clicked() {
-                println!("{}", ytapp.ImeDatoteke);
                 OdpriMapo(ytapp);
             }
         }

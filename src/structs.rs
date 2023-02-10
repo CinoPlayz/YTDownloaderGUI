@@ -29,6 +29,7 @@ pub struct Format{
     pub ID: String,
     pub VideoFormat: String,    
     pub Rezolucija: String,
+    pub ExtFormat: String,
 }
 
 impl Default for Format{
@@ -36,7 +37,8 @@ impl Default for Format{
         Format { 
             ID: "".to_string(), 
             VideoFormat: "".to_string(), 
-            Rezolucija: "".to_string()
+            Rezolucija: "".to_string(),
+            ExtFormat: "".to_string()
         }
     }
 }
