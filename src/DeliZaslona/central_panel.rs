@@ -81,7 +81,7 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
 
            
             
-            if ytapp.Tip == "Video"{   
+            if ytapp.Tip == "Video"{                  
                 // region: Videjo Izbira
                 //Margin za centriranje             
                 let mut margin_centriranje = (ui.ctx().used_size()[0] - 510.0) / 2.0;
@@ -267,7 +267,6 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
                 });
 
                 // endregion
-             
             }
             else{
                 // region: Audio Izbira
@@ -409,8 +408,15 @@ pub fn DodajFunkcionalnost(ytapp: &mut YTApp, ctx: &egui::Context){
     //Če je bil kliknjen gumb za prenos videju
     if ytapp.CPPrenosEvent.kliknjen == true{
 
-        //Prenese video
-        Funkcionalnost::prenesi_video::Prenesi_Video(ytapp);  
+        if ytapp.Tip == "Video"{
+            //Prenese video
+            Funkcionalnost::prenesi_video::Prenesi_Video(ytapp); 
+        }
+        else{
+            //Prenese audio
+            Funkcionalnost::prenesi_audio::Prenesi_Audio(ytapp)
+        }
+         
 
         //Refreša tako dolgo dokler ni konec s prenosom
         ctx.request_repaint();
