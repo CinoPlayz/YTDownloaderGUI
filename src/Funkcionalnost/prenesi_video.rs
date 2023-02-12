@@ -73,6 +73,7 @@ pub fn Prenesi_Video(ytapp: &mut YTApp){
                                 .args([r".\yt-dlp.exe", "-f", &FormatPrenos, "-P", &PotDoVideo, "-S res,ext:mp4:m4a --recode mp4", &URL, "--embed-thumbnail", "--restrict-filenames"])
                                 .creation_flags(CREATE_NO_WINDOW)
                                 .stdout(Stdio::piped())
+                                .stderr(Stdio::piped())
                                 .spawn();
                             }
                             else{
@@ -80,6 +81,7 @@ pub fn Prenesi_Video(ytapp: &mut YTApp){
                                 .args([r".\yt-dlp.exe", "-f", &FormatPrenos, "-P", &PotDoVideo, &URL, "--embed-thumbnail", "--restrict-filenames"])
                                 .creation_flags(CREATE_NO_WINDOW)
                                 .stdout(Stdio::piped())
+                                .stderr(Stdio::piped())
                                 .spawn();
                             }
                           
@@ -87,9 +89,48 @@ pub fn Prenesi_Video(ytapp: &mut YTApp){
                             match ruslt_otrok {
                                 //Preveri če je vredu napisan command
                                 Ok(otrok) => {
+
+                                    //Če je napaka v izpisu
+                                    match otrok.stderr{
+                                        Some(stderr) => {
+                                            //Ustvari se nov BufReader v katerega se zapišejo podatki iz stdout
+                                            let stderr_reader = BufReader::new(stderr);
+                            
+                                            //Razdeli kar je BufReaderju v to da se izpiše vsaka posodobitev commandlina in da rezultate v array vrednost, ki obstaja 
+                                            let stderr_lines2 = stderr_reader.split(b'\r');
+
+                                            //Gre čez linije, ki se prikažejo v powershellu preveri da niso prazne in jih pošlje po channelju
+                                            for line in stderr_lines2 {
+                                                match line{
+                                                    Ok(podatek) => {
+
+                                                        //Sestavi napako
+                                                        let podatek_string = String::from_utf8_lossy(&podatek).to_string();
+                                                                                           
+                                                        //Preveri da ni warning ampak samo error
+                                                        if !podatek_string.contains("WARNING:"){
+                                                            //Poslje napako
+                                                            match sender.send(podatek_string.clone()){
+                                                                Ok(_) => {},
+                                                                Err(e) => {println!("{}", e)},
+                                                            } 
+                                                        }
+                                                        
+                                                        
+
+                                                    },
+                                                    Err(e) => eprintln!("Nekaj narobe s podatkom: {}", e),
+                                                }
+                                            }
+                                        },
+                                        None => {},
+                                    }
+
+
+                                    //Če ni napaka v izpisu
                                     match otrok.stdout {
                                         Some(stdout) => {
-
+                                            
                                             //Ustvari se nov BufReader v katerega se zapišejo podatki iz stdout
                                             let stdout_reader = BufReader::new(stdout);
                             
@@ -100,6 +141,7 @@ pub fn Prenesi_Video(ytapp: &mut YTApp){
                                             for line in stdout_lines2 {
                                                 match line{
                                                     Ok(podatek) => {
+
                                                         //Sestavi sporocilo
                                                         sporocilo = String::from("[ok]");
                                                         let podatek_string = String::from_utf8_lossy(&podatek).to_string();
@@ -154,7 +196,7 @@ pub fn Prenesi_Video(ytapp: &mut YTApp){
                                         }
                                         None => println!("Napaka pri otroku")
                                     }
-                                
+                             
                                 },
                                 Err(e) => {
                                     sporocilo = e.to_string();
@@ -186,10 +228,9 @@ pub fn Prenesi_Video(ytapp: &mut YTApp){
             //Dobi sporocilo, če je vredu vse potem so prve 4 byti [ok]
             let mut prvi_4 = sporocilo.clone();
             prvi_4.truncate(4);  
-            
 
             //Preveri če je bila kakšna napaka
-            if prvi_4 != "[ok]" {
+            if prvi_4 != "[ok]" {                
                 ytapp.CPPrenosPrejeto.napaka = true;
                 ytapp.CPPrenosEvent.kliknjen = false;
                 
