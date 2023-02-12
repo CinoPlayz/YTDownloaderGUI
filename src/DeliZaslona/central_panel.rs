@@ -79,7 +79,12 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
 
             // endregion
 
-           
+           //Spreminjanje tip in tip prej (Kdaj se pokaže gumb za odpiranje datotek)
+           if ytapp.Tip != ytapp.TipPrej{
+                ytapp.ImeDatoteke.clear();
+                ytapp.TipPrej = ytapp.Tip.clone();
+           }
+
             
             if ytapp.Tip == "Video"{                  
                 // region: Videjo Izbira
