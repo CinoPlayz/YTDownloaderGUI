@@ -95,6 +95,8 @@ pub struct YTApp {
     pub IzbranVrsta: String,
     #[serde(skip)]
     pub Tip: String,
+    #[serde(skip)] //Uporabljen za takrat ko se spremeni checkbox tip
+    pub TipPrej: String,
     #[serde(skip)]
     pub YTKanal: String,
     #[serde(skip)]
@@ -151,6 +153,7 @@ impl Default for YTApp {
             IzbranZanra: String::from("Ostalo"),
             IzbranVrsta: String::from("wav"),
             Tip: String::from("Video"),
+            TipPrej: String::from("Video"),
             YTKanal: String::new(),
             ImeDatoteke: String::new(),
             MP4: false,
