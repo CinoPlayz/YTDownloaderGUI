@@ -7,6 +7,7 @@ use crate::app::YTApp;
 use crate::Funkcionalnost;
 use crate::structs::PrejetoEvent;
 use crate::Funkcionalnost::skupno::IzpisiNapako;
+use crate::structs::Format;
 
 pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
     //Centrira elemente
@@ -31,7 +32,7 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
         .show(ui, |ui| {
 
             ui.label("URL: ");
-            ui.add(egui::TextEdit::singleline(&mut ytapp.URL).desired_width(400.0));
+            ui.add(egui::TextEdit::singleline(&mut ytapp.URL).desired_width(420.0));
             
             //Ni enablan takrat ko pridobiva podatke oz. prenaša video/audio
             if ytapp.CPPosljiEvent.kliknjen{
@@ -53,6 +54,9 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
                     ytapp.CPPosljiPrejeto = PrejetoEvent{..Default::default()};
                     ytapp.ImeDatoteke = String::new();
                     ytapp.MP4 = false;
+
+                    //Izprazne izbrani format (rezolucija kodek)
+                    ytapp.IzbranFormat = Format { ..Default::default()};
                 }
             });
             
