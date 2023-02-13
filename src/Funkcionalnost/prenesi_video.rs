@@ -58,7 +58,7 @@ pub fn Prenesi_Video(ytapp: &mut YTApp){
                 //Zažene nov thread, kjer izvede postopek za prenos
                 thread::spawn(move|| {
 
-                    let mut sporocilo = String::new();
+                    let mut sporocilo = String::new();                   
 
                     //Nastavi env pot tam kjer je yt-dlp
                     match env::set_current_dir(&PotDoYTDLP){
