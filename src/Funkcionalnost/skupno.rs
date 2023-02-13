@@ -18,7 +18,7 @@ fn nalozi_sliko_napaka(ytapp: &mut YTApp, ctx: &egui::Context) {
 
     if ytapp.TextureNapaka.is_none(){
         //Dobi podatke iz slike
-        let nalozi_sliko = nalozi_sliko_iz_poti(Path::new("assets/icon/napaka-icon-36px.png")).expect("Ni možno naložiti slike");
+        let nalozi_sliko = nalozi_sliko_iz_poti(Path::new("../../assets/icon/napaka-icon-36px.png")).expect("Ni možno naložiti slike");
 
         //Nastavi TextureNapaka na spodnje podatke
         ytapp.TextureNapaka.get_or_insert_with(|| {           

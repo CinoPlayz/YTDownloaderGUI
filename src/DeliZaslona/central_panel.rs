@@ -32,15 +32,30 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
 
             ui.label("URL: ");
             ui.add(egui::TextEdit::singleline(&mut ytapp.URL).desired_width(400.0));
-    
-            if ui.button("Pošlji").clicked(){
-                ytapp.CPPosljiEvent.kliknjen = true;
-                ytapp.CPPrikazujSpinner = true;
-                ytapp.CPReisiverPrenosPoln = false;
-                ytapp.CPPosljiPrejeto = PrejetoEvent{..Default::default()};
-                ytapp.ImeDatoteke = String::new();
-                ytapp.MP4 = false;
+            
+            //Ni enablan takrat ko pridobiva podatke oz. prenaša video/audio
+            if ytapp.CPPosljiEvent.kliknjen{
+                ytapp.CPPosljiEnabled = false;
             }
+            else if ytapp.CPPrenosEvent.kliknjen{
+                ytapp.CPPosljiEnabled = false;
+            }
+            else{
+                ytapp.CPPosljiEnabled = true;
+            }
+
+
+            ui.add_enabled_ui(ytapp.CPPosljiEnabled, |ui|{
+                if ui.button("Pošlji").clicked(){
+                    ytapp.CPPosljiEvent.kliknjen = true;
+                    ytapp.CPPrikazujSpinner = true;
+                    ytapp.CPReisiverPrenosPoln = false;
+                    ytapp.CPPosljiPrejeto = PrejetoEvent{..Default::default()};
+                    ytapp.ImeDatoteke = String::new();
+                    ytapp.MP4 = false;
+                }
+            });
+            
         });
       
 
@@ -354,12 +369,15 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
 
 
             // region: Prenos
-            if ui.button("Prenesi").clicked(){
-                ytapp.CPPrenosEvent.kliknjen = true;
-                ytapp.CPPrenosPrejeto = PrejetoEvent{..Default::default()};
-                ytapp.CPReisiverPrenosPoln = false;
-                ytapp.ImeDatoteke = String::new();
-            }
+            ui.add_enabled_ui(!ytapp.CPPrenosEvent.kliknjen, |ui|{
+                if ui.button("Prenesi").clicked(){
+                    ytapp.CPPrenosEvent.kliknjen = true;
+                    ytapp.CPPrenosPrejeto = PrejetoEvent{..Default::default()};
+                    ytapp.CPReisiverPrenosPoln = false;
+                    ytapp.ImeDatoteke = String::new();
+                }
+            });
+           
 
             // endregion
 

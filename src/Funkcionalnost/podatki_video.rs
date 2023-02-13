@@ -44,10 +44,10 @@ pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp){
                     match output {
                         //Preveri če je vredu napisan command
                         Ok(output) => {
-                            //Preveri če je prišlo na napako med izvajanjem
+                            //Preveri če je prišlo na napako med izvajanjem in da ni to samo WARNING
                             let stderr =  String::from_utf8_lossy(&output.stderr);
-                            if stderr != ""{
-                                sporocilo = stderr.to_string();
+                            if stderr != "" && !stderr.contains("WARNING:"){
+                                sporocilo = stderr.to_string();                                
                             }
                             else{
                                 //AVC(H.264) videji so slabe kvalitete, vendar podprti skoraj da vsepovsod

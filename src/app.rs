@@ -71,6 +71,8 @@ pub struct YTApp {
     pub CPProcenti: f32,
     #[serde(skip)]
     pub CPCasPrenos: String,
+    #[serde(skip)]
+    pub CPPosljiEnabled: bool,
 
 
 
@@ -139,6 +141,7 @@ impl Default for YTApp {
             CPReisiverPrenosPoln: false,  
             CPProcenti: 0.0,
             CPCasPrenos: "".to_string(),
+            CPPosljiEnabled: true,
 
             //Funkcionalnost
             Formati: Vec::new(),
