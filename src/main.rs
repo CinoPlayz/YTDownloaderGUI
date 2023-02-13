@@ -32,7 +32,8 @@ fn main() {
     };
     
     let _native_options = eframe::NativeOptions::default();
-    eframe::run_native(
+    
+    match eframe::run_native(
         "YT Downloader",
         options,
         Box::new(|creation_context| {
@@ -44,8 +45,10 @@ fn main() {
             creation_context.egui_ctx.set_style(style);
             Box::new(YTApp::new(creation_context))
         }),
-
-    );
+    ){
+        Ok(_) => {},
+        Err(napaka) => println!("Napaka pri zagonu: {}", napaka),
+    }
 
     fn load_icon(path: &str) -> eframe::IconData {
         let (icon_rgba, icon_width, icon_height) = {
