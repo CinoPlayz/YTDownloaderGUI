@@ -129,12 +129,57 @@ pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp){
 
                 //Dobi ime kanala v ascii obliki
                 ytapp.YTKanal = Pretvori_Non_Ascii(v["channel"].to_string());
-            
 
                 //Nalozi Kategorije v spremeljivko, če še nikoli niso bile
                 if ytapp.KategorijeAudio.is_empty() || ytapp.KategorijeVideo.is_empty() {
                     NaloziKategorije(ytapp);
                 }
+
+                //Dobi tage ter pregleda, če je kakšen enak kategoriji
+                if let Some(tags) = v["tags"].as_array(){
+                    for tag in tags{
+                        let tag_upper = tag.to_string().to_uppercase().replace("\"", "");
+                        let mut najden = false;
+
+                        //Preveri če je tag enak enemu izmed kategorij za video
+                        let kategorije = ytapp.KategorijeVideo.clone();
+                        let dolzina = kategorije.len();
+
+                        for i in 0..dolzina{
+                            let kategorija = kategorije[i].clone().to_uppercase();
+
+                            if kategorija == tag_upper{
+                                ytapp.IzbranKategorija = kategorije[i].clone();
+                                najden = true;
+                                break;
+                            }
+
+                        }
+
+
+                        //Preveri če je tag enak enemu izmed žanr za audio
+                        if !najden{
+                            let zanre = ytapp.KategorijeAudio.clone();
+                            let dolzina = zanre.len();
+
+                            for i in 0..dolzina{
+                                let zanra = zanre[i].clone().to_uppercase();
+
+    
+                                if zanra == tag_upper{
+                                    ytapp.IzbranZanra = zanre[i].clone();
+                                    break;
+                                }
+    
+                            }
+                        }
+
+                        
+                    }
+                }
+            
+
+                
                 
             }
             
