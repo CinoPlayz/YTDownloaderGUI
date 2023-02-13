@@ -368,32 +368,36 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
 
         //Preveri če se prenaša
         if ytapp.CPPrenosPrejeto.aktivno == true && ytapp.CPPrenosPrejeto.napaka == false {
-            ui.add(egui::widgets::ProgressBar::show_percentage(egui::widgets::ProgressBar::new(ytapp.CPProcenti)));
-            ui.label(&ytapp.CPCasPrenos);
+            egui::Frame::none()
+            .inner_margin(Margin{top: 20.0, bottom: 20.0, ..Default::default()})
+            .show(ui, |ui|{
+                ui.add(egui::widgets::ProgressBar::show_percentage(egui::widgets::ProgressBar::new(ytapp.CPProcenti)));
+                ui.label(&ytapp.CPCasPrenos);
+            });            
         }
 
         //Preveri če je prenesena datoteka
         if !ytapp.ImeDatoteke.is_empty() {
-            ui.label("Preneseno:");
-            if ui.button("Odpri").clicked() {
-                OdpriDatoteko(ytapp);
-            }
 
-            if ui.button("Odpri mapo").clicked() {
-                OdpriMapo(ytapp);
-            }
+            egui::Frame::none()
+            .inner_margin(Margin{top: 20.0, bottom: 20.0, ..Default::default()})
+            .show(ui, |ui|{
+                ui.label("Preneseno:");
+                if ui.button("Odpri").clicked() {
+                    OdpriDatoteko(ytapp);
+                }
+    
+                if ui.button("Odpri mapo").clicked() {
+                    OdpriMapo(ytapp);
+                }
+            });
+         
         }
 
 
 
     });
-    
-    ui.add(egui::Slider::new(&mut ytapp.age, 0..=120).text("age"));
-    if ui.button("Click each year").clicked() {
-        ytapp.age += 1;
-    }
-
-
+  
    
 }
 

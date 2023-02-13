@@ -10,14 +10,12 @@ use crate::DeliZaslona;
 use crate::structs::GumbEvent;
 use crate::structs::PrejetoEvent;
 use crate::structs::Format;
-use crate::Funkcionalnost::skupno::IzpisiNapako;
 
 
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)]
 pub struct YTApp {
     pub URL: String,
-    pub age: u32,
     pub PotDoYTDLP: Option<String>,
     pub PotDoVideo: Option<String>,
     pub PotDoAudio: Option<String>,
@@ -111,7 +109,6 @@ impl Default for YTApp {
     fn default() -> Self {
         Self {
             URL: "".to_owned(),
-            age: 42,
             PotDoYTDLP: None,
             PotDoVideo: None,
             PotDoAudio: None,
@@ -233,14 +230,7 @@ impl eframe::App for YTApp {
             
       
             DeliZaslona::central_panel::DodajIzgledInFunkcionalnostZaDruge(self, ctx);
-            
-            ui.label("neki \n dsfsd");
-
-            IzpisiNapako(self, ctx, self.IDjiZaNapakaWindow[0], "Napaka 1". to_string());
-            let string = "line one \n line two";
-            IzpisiNapako(self, ctx,  self.IDjiZaNapakaWindow[1], string.to_string());
-        
-
+   
         });
     }
 
