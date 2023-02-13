@@ -34,6 +34,12 @@ pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp){
                 Err(e) => {println!("{}", e)},
             } 
         }
+        else if URL.contains(".com/c/") || URL.contains(".com/@"){
+            match sender.send("Možnost za kanale še ni implemintirana".to_string()){
+                Ok(_) => {},
+                Err(e) => {println!("{}", e)},
+            } 
+        }
         else{
             //Zažene nov thread, kjer izvede postopek za pridobivanje informacij
             thread::spawn(move|| {
