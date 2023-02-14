@@ -6,10 +6,10 @@ use std::sync::mpsc;
 use std::sync::mpsc::Receiver;
 
 use crate::DeliZaslona;
-//use crate::Funkcionalnost;
 use crate::structs::GumbEvent;
 use crate::structs::PrejetoEvent;
 use crate::structs::Format;
+use crate::Funkcionalnost::skupno::nalozi_sliko_napaka;
 
 
 #[derive(serde::Deserialize, serde::Serialize)]
@@ -210,8 +210,11 @@ impl eframe::App for YTApp {
         eframe::set_value(storage, eframe::APP_KEY, self);
     }
 
-    fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {     
-        
+    fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {  
+
+        //Naloži sliko za napako (samo enkrat)   
+        nalozi_sliko_napaka(self, ctx);
+
         //Zgronji del (TopPanel)
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             

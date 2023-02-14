@@ -14,7 +14,7 @@ fn nalozi_sliko_iz_poti(path: &std::path::Path) -> Result<egui::ColorImage, imag
     ))
 }
 
-fn nalozi_sliko_napaka(ytapp: &mut YTApp, ctx: &egui::Context) {
+pub fn nalozi_sliko_napaka(ytapp: &mut YTApp, ctx: &egui::Context) {
 
     if ytapp.TextureNapaka.is_none(){
         //Dobi podatke iz slike
@@ -35,8 +35,6 @@ fn nalozi_sliko_napaka(ytapp: &mut YTApp, ctx: &egui::Context) {
 }
 
 pub fn IzpisiNapako(ytapp: &mut YTApp, ctx: &egui::Context, ID: u16, napaka: String){
-
-    nalozi_sliko_napaka(ytapp, ctx);
 
     //Ustvari nov egui window za napako in mu nastavi id
     egui::Window::new(RichText::new("Napaka").size(20.0))
