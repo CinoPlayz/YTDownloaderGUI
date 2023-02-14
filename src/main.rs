@@ -14,19 +14,18 @@ fn main() {
     //Dobi themo računalnika
     let mode = dark_light::detect();
     let thema;
-    let icon_pot;
 
     match mode {
-        dark_light::Mode::Dark => {thema = Visuals::dark(); icon_pot = "assets/icon/icon-light.png"},
-        dark_light::Mode::Light => {thema = Visuals::light(); icon_pot = "assets/icon/icon-dark.png"},
-        dark_light::Mode::Default => {thema = Visuals::dark(); icon_pot = "assets/icon/icon-light.png"},
+        dark_light::Mode::Dark => {thema = Visuals::dark()},
+        dark_light::Mode::Light => {thema = Visuals::light()},
+        dark_light::Mode::Default => {thema = Visuals::dark()},
     }
     
     tracing_subscriber::fmt::init();
 
     //Window options
     let options = eframe::NativeOptions {
-        icon_data: Some(load_icon(icon_pot)), 
+        icon_data: Some(load_icon("assets/icon/icon-red.png")), 
         initial_window_size: Some(egui::Vec2::new(500.0, 620.0)),
         min_window_size: Some(egui::Vec2::new(500.0, 620.0)),
         ..Default::default()
