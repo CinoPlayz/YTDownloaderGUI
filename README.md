@@ -5,6 +5,8 @@
 
 </div>
 
+[![Objava verzija](https://img.shields.io/github/downloads/CinoPlayz/YTDownloaderGUI/latest/total?label=PRENOS&style=for-the-badge)](#prenos "Prenos")
+
 **Preprost YT video/music downloader.**
 
 **Dela samo na _windows_ sistemih!**
