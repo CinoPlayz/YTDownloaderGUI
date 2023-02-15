@@ -5,7 +5,8 @@
 
 </div>
 
-![GitHub release (latest by date)](https://img.shields.io/github/downloads/CinoPlayz/YTDownloaderGUI/latest/total?label=PRENOS&style=for-the-badge)
+[![Zadnja Objava](https://img.shields.io/github/downloads/CinoPlayz/YTDownloaderGUI/latest/total?label=PRENOS&style=for-the-badge)](https://github.com/CinoPlayz/YTDownloaderGUI/releases/latest)
+
 
 **Preprost YT video/music downloader.**
 
