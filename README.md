@@ -5,7 +5,7 @@
 
 </div>
 
-[![Objava verzija](https://img.shields.io/github/downloads/CinoPlayz/YTDownloaderGUI/latest/total?label=PRENOS&style=for-the-badge)](#prenos "Prenos")
+![GitHub release (latest by date)](https://img.shields.io/github/downloads/CinoPlayz/YTDownloaderGUI/latest/total?label=PRENOS&style=for-the-badge)
 
 **Preprost YT video/music downloader.**
 
