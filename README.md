@@ -3,10 +3,11 @@
 
 ![ICON](assets/icon/icon-red.png)
 
+[![Zadnja Objava](https://img.shields.io/github/downloads/CinoPlayz/YTDownloaderGUI/latest/total?logo=github&style=for-the-badge)](https://github.com/CinoPlayz/YTDownloaderGUI/releases/latest)
+
 </div>
 
-[![Zadnja Objava](https://img.shields.io/github/downloads/CinoPlayz/YTDownloaderGUI/latest/total?label=PRENOS&style=for-the-badge)](https://github.com/CinoPlayz/YTDownloaderGUI/releases/latest)
-
+<br />
 
 **Preprost YT video/music downloader.**
 
