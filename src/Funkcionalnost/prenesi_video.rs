@@ -23,9 +23,19 @@ pub fn Prenesi_Video(ytapp: &mut YTApp){
         ytapp.CPReisiverPrenos = receiver;
         ytapp.CPReisiverPrenosPoln = true;
 
-        //Preveri, če je mp4, izbran tudi tak kodek, ki se pretvori v mp4
+        //Preveri če je izbrana rezolucija
         let mut napaka_prej = false;
-        if ytapp.MP4{
+        if ytapp.IzbranFormat.Rezolucija.is_empty(){
+            napaka_prej = true;
+            match sender.send("Izberi rezolucijo".to_string()){
+                Ok(_) => {},
+                Err(e) => {println!("{}", e)},
+            } 
+        }
+
+
+        //Preveri, če je mp4, izbran tudi tak kodek, ki se pretvori v mp4        
+        if ytapp.MP4 && !napaka_prej{
             if ytapp.IzbranFormat.ExtFormat != "mp4"{
                 napaka_prej = true;
                 match sender.send("Izberi kodek, ki podpira mp4".to_string()){
@@ -36,7 +46,7 @@ pub fn Prenesi_Video(ytapp: &mut YTApp){
         }
 
         //Preveri da je pot do video nastavljena
-        if !ytapp.PotDoVideo.is_some() {
+        if !ytapp.PotDoVideo.is_some() && !napaka_prej {
             match sender.send("Izberi lokacijo za shranjevanje videjev".to_string()){
                 Ok(_) => {},
                 Err(e) => {println!("{}", e)},
