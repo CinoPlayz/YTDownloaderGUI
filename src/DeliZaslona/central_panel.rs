@@ -7,6 +7,7 @@ use crate::app::YTApp;
 use crate::Funkcionalnost;
 use crate::structs::PrejetoEvent;
 use crate::Funkcionalnost::skupno::IzpisiNapako;
+use crate::Funkcionalnost::skupno::NaloziKategorije;
 use crate::structs::Format;
 
 pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
@@ -425,6 +426,11 @@ pub fn DodajIzgled(ytapp: &mut YTApp,  ui: &mut Ui){
 
 
 pub fn DodajFunkcionalnost(ytapp: &mut YTApp, ctx: &egui::Context){
+
+    //Nalozi Kategorije v spremeljivko, če še nikoli niso bile
+     if ytapp.KategorijeAudio.is_empty() || ytapp.KategorijeVideo.is_empty() {
+        NaloziKategorije(ytapp);
+    }
 
     //Če je bil kliknjen gumb za pridobivanje informacij o videju
     if ytapp.CPPosljiEvent.kliknjen == true{

@@ -1,7 +1,9 @@
 use crate::YTApp;
+use crate::structs::Kategorije;
 use std::path::Path;
 use egui::RichText;
 use egui::Id;
+use std::fs::File;
 
 fn nalozi_sliko_iz_poti(path: &std::path::Path) -> Result<egui::ColorImage, image::ImageError> {
     let image = image::io::Reader::open(path)?.decode()?;
@@ -88,6 +90,49 @@ pub fn NarediNoveVrstice(besedilo: String) -> String{
     return  novo_besedilo;
 
     
+}
+
+
+pub fn NaloziKategorije(ytapp: &mut YTApp){
+    //Dobi kategorije iz datoteke
+    match File::open("assets/config/KategorijeVidejev.json"){
+        Err(napaka) => {
+            ytapp.CPPosljiPrejeto.napaka = true;
+            ytapp.PrikaziNapakoUI = true;
+            ytapp.IzpisujNapako = true;
+            ytapp.Napaka = format!("JSON: {}", napaka.to_string());
+        },
+        Ok(datoteka) => {  
+
+            let Kategorije: Kategorije = serde_json::from_reader(datoteka).unwrap();
+            for kategorija in Kategorije.Kategorije{
+                ytapp.KategorijeVideo.push(kategorija);
+            }
+            
+
+        },
+        
+    }
+    
+    //Dobi žanre iz datoteke
+    match File::open("assets/config/ZanraPesmi.json"){
+        Err(napaka) => {
+            ytapp.CPPosljiPrejeto.napaka = true;
+            ytapp.PrikaziNapakoUI = true;
+            ytapp.IzpisujNapako = true;
+            ytapp.Napaka = format!("JSON: {}", napaka.to_string());
+        },
+        Ok(datoteka) => {                
+            let Kategorije: Kategorije = serde_json::from_reader(datoteka).unwrap();
+            for kategorija in Kategorije.Kategorije{
+                ytapp.KategorijeAudio.push(kategorija);
+            }
+
+        },
+        
+    }
+    
+
 }
 
 

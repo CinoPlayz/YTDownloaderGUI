@@ -1,13 +1,11 @@
 use crate::app::YTApp;
-use crate::structs::{Format, Kategorije};
-
+use crate::structs::Format;
 use std::env;
 use std::process::Command;
 use std::sync::mpsc::{self, Sender, Receiver};
 use std::thread;
 use std::os::windows::process::CommandExt;
-use serde_json::{Value};
-use std::fs::File;
+use serde_json::Value;
 
 use super::skupno::Pretvori_Non_Ascii;
 
@@ -146,12 +144,7 @@ pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp){
 
                 //Dobi ime kanala v ascii obliki
                 ytapp.YTKanal = Pretvori_Non_Ascii(v["channel"].to_string());
-
-                //Nalozi Kategorije v spremeljivko, če še nikoli niso bile
-                if ytapp.KategorijeAudio.is_empty() || ytapp.KategorijeVideo.is_empty() {
-                    NaloziKategorije(ytapp);
-                }
-
+        
                 //Dobi tage ter pregleda, če je kakšen enak kategoriji
                 if let Some(tags) = v["tags"].as_array(){
                     for tag in tags{
@@ -211,46 +204,3 @@ pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp){
     
 }
 
-
-
-pub fn NaloziKategorije(ytapp: &mut YTApp){
-    //Dobi kategorije iz datoteke
-    match File::open("../../assets/config/KategorijeVidejev.json"){
-        Err(napaka) => {
-            ytapp.CPPosljiPrejeto.napaka = true;
-            ytapp.PrikaziNapakoUI = true;
-            ytapp.IzpisujNapako = true;
-            ytapp.Napaka = format!("JSON: {}", napaka.to_string());
-        },
-        Ok(datoteka) => {  
-
-            let Kategorije: Kategorije = serde_json::from_reader(datoteka).unwrap();
-                for kategorija in Kategorije.Kategorije{
-                    ytapp.KategorijeVideo.push(kategorija);
-                }
-            
-
-        },
-        
-    }
-    
-    //Dobi žanre iz datoteke
-    match File::open("../../assets/config/ZanraPesmi.json"){
-        Err(napaka) => {
-            ytapp.CPPosljiPrejeto.napaka = true;
-            ytapp.PrikaziNapakoUI = true;
-            ytapp.IzpisujNapako = true;
-            ytapp.Napaka = format!("JSON: {}", napaka.to_string());
-        },
-        Ok(datoteka) => {                
-            let Kategorije: Kategorije = serde_json::from_reader(datoteka).unwrap();
-            for kategorija in Kategorije.Kategorije{
-                ytapp.KategorijeAudio.push(kategorija);
-            }
-
-        },
-        
-    }
-    
-
-}
