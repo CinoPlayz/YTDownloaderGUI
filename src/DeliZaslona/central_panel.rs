@@ -528,7 +528,7 @@ pub fn DodajIzgledInFunkcionalnostZaDruge(ytapp: &mut YTApp, ctx: &egui::Context
             //Postavi v grid zato da sta v eni vrstici
             egui::Grid::new("88427").spacing([0.0,7.0]).show(ui, |ui| {
                 
-                ui.vertical_centered(|ui|{
+                ui.horizontal_centered(|ui|{
                     ui.label("Izberi lokacijo, kjer shranjujem videje: ");
                     if ui.button("Izberi").clicked() {
                         if let Some(path) = rfd::FileDialog::new().pick_folder() {
@@ -577,7 +577,7 @@ pub fn DodajIzgledInFunkcionalnostZaDruge(ytapp: &mut YTApp, ctx: &egui::Context
             //Postavi v grid zato da sta v eni vrstici
             egui::Grid::new("88427").spacing([0.0,7.0]).show(ui, |ui| {
                 
-                ui.vertical_centered(|ui|{
+                ui.horizontal_centered(|ui|{
                     ui.label("Izberi lokacijo, kjer shranjujem audio: ");
                     if ui.button("Izberi").clicked() {
                         if let Some(path) = rfd::FileDialog::new().pick_folder() {

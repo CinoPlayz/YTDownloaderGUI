@@ -17,7 +17,12 @@ pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp){
     //Preveri da Reciever ni že slučajno povjen (uporabljen)
     if !ytapp.CPReisiverJSONPoln {
 
-        let PotDoYTDLP = ytapp.PotDoYTDLP.as_ref().unwrap().clone();
+        let mut PotDoYTDLP = String::new();
+        match &ytapp.PotDoYTDLP {
+            Some(pot) => {PotDoYTDLP.push_str(&pot);},
+            None => {PotDoYTDLP.push_str("Pot ni podana.");},
+        }
+
         let URL = ytapp.URL.clone();
 
         //Odpre nov kanal za prenos informacij
@@ -25,8 +30,15 @@ pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp){
         ytapp.CPReisiverJSON = receiver;
         ytapp.CPReisiverJSONPoln = true;
 
+        //Preveri da je pot do YTDLP podana
+        if PotDoYTDLP == "Pot ni podana."{
+            match sender.send("Pot do YT-DLP ni podana".to_string()){
+                Ok(_) => {},
+                Err(e) => {println!("{}", e)},
+            } 
+        }
         //Preveri da ni slučajno playlist
-        if URL.contains(".com/playlist?list"){
+        else if URL.contains(".com/playlist?list"){
             match sender.send("Možnost za playlist še ni implemintirana".to_string()){
                 Ok(_) => {},
                 Err(e) => {println!("{}", e)},

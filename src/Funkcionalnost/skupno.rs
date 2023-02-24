@@ -42,9 +42,10 @@ pub fn IzpisiNapako(ytapp: &mut YTApp, ctx: &egui::Context, ID: u16, napaka: Str
     egui::Window::new(RichText::new("Napaka").size(20.0))
     .id(Id::new(ID))
     .min_width(200.0)
-    .min_height(100.0)
+    .min_height(100.0)        
     .collapsible(false)
     .resizable(false)
+    .default_pos([125.0, 200.0])
     .open(&mut ytapp.PrikaziNapakoUI).show(ctx, |ui| {    
         //Dobi podatke iz TextureNapaka
         let texture: &egui::TextureHandle = &ytapp.TextureNapaka.as_mut().unwrap();

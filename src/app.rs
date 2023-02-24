@@ -211,7 +211,6 @@ impl eframe::App for YTApp {
     }
 
     fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {  
-
         //Naloži sliko za napako (samo enkrat)   
         nalozi_sliko_napaka(self, ctx);
 
