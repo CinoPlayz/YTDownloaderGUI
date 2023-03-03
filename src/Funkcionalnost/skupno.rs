@@ -36,6 +36,15 @@ pub fn nalozi_sliko_napaka(ytapp: &mut YTApp, ctx: &egui::Context) {
    
 }
 
+pub fn nalozi_verzijo(ytapp: &mut YTApp) {
+
+    if ytapp.AppVerzija.is_none(){
+        const VERSION: Option<&str> = option_env!("CARGO_PKG_VERSION");
+        ytapp.AppVerzija = Some(VERSION.unwrap_or("Neznano").to_string());        
+    }
+   
+}
+
 pub fn IzpisiNapako(ytapp: &mut YTApp, ctx: &egui::Context, ID: u16, napaka: String){
 
     //Ustvari nov egui window za napako in mu nastavi id

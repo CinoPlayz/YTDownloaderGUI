@@ -10,6 +10,7 @@ use crate::structs::GumbEvent;
 use crate::structs::PrejetoEvent;
 use crate::structs::Format;
 use crate::Funkcionalnost::skupno::nalozi_sliko_napaka;
+use crate::Funkcionalnost::skupno::nalozi_verzijo;
 
 
 #[derive(serde::Deserialize, serde::Serialize)]
@@ -18,7 +19,7 @@ pub struct YTApp {
     pub URL: String,
     pub PotDoYTDLP: Option<String>,
     pub PotDoVideo: Option<String>,
-    pub PotDoAudio: Option<String>,
+    pub PotDoAudio: Option<String>,    
 
     //Kar se ne rabi shraniti
 
@@ -35,6 +36,8 @@ pub struct YTApp {
     pub Napaka: String,
 
     //Nastavitve
+    #[serde(skip)]
+    pub AppVerzija: Option<String>,
     #[serde(skip)]
     pub PrikaziNastavitveYTDLPUI: bool,
     #[serde(skip)]
@@ -116,7 +119,8 @@ impl Default for YTApp {
             PotDoAudio: None,
             IDjiZaNapakaWindow: Vec::from([64345, 38015, 41661, 32302, 35660, 64159, 48057, 12441, 15910, 48957, 
                 30690, 29088, 22894, 54035, 19348, 34923, 59481, 45316, 46313, 50076]),
-            TextureNapaka: None,           
+            TextureNapaka: None,   
+            AppVerzija: None,        
             PrikaziNapakoUI: true,  
             IzpisujNapako: false,    
             Napaka: "".to_string(),   
@@ -211,8 +215,9 @@ impl eframe::App for YTApp {
     }
 
     fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {  
-        //Naloži sliko za napako (samo enkrat)   
+        //Naloži sliko za napako in verzijo (samo enkrat)   
         nalozi_sliko_napaka(self, ctx);
+        nalozi_verzijo(self);
 
         //Zgronji del (TopPanel)
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {

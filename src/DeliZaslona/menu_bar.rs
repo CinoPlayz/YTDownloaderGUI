@@ -9,6 +9,7 @@ pub fn DodajIzgled(ytapp: &mut YTApp, ui: &mut Ui, frame: &mut Frame){
         if ui.button("Zapri").clicked() {
             frame.close();
         }
+        ui.label(format!("Verzija: {}", ytapp.AppVerzija.as_ref().unwrap().clone()));
     });
 
     ui.menu_button("Nastavitve", |ui|{

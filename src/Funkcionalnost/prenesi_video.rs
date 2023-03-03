@@ -232,9 +232,6 @@ pub fn Prenesi_Video(ytapp: &mut YTApp){
      //Preveri če je pridobil kakšno informacijo
      match ytapp.CPReisiverPrenos.try_recv() {
         Ok(mut sporocilo) => {
-
-            println!("{}", sporocilo);
-
             ytapp.CPPrenosPrejeto.aktivno = true;
 
             //Dobi sporocilo, če je vredu vse potem so prve 4 byti [ok]
