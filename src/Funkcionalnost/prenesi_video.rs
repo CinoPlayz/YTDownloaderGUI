@@ -233,6 +233,8 @@ pub fn Prenesi_Video(ytapp: &mut YTApp){
      match ytapp.CPReisiverPrenos.try_recv() {
         Ok(mut sporocilo) => {
 
+            println!("{}", sporocilo);
+
             ytapp.CPPrenosPrejeto.aktivno = true;
 
             //Dobi sporocilo, če je vredu vse potem so prve 4 byti [ok]
@@ -323,6 +325,17 @@ pub fn Prenesi_Video(ytapp: &mut YTApp){
                     }
                     
 
+                }
+                //To preveri če je konec še druga možnost
+                else if sporocilo.contains(" mutagen: Adding thumbnail to ") {
+                    ytapp.CPPrenosEvent.kliknjen = false;
+                    ytapp.CPReisiverPrenosPoln = false;
+                    ytapp.CPPrenosPrejeto = PrejetoEvent{ ..Default::default()};
+
+                    //Dobi podatke od "
+                    sporocilo.drain(..sporocilo.find(" mutagen: Adding thumbnail to \"").unwrap()+31);
+                    sporocilo.truncate(sporocilo.find('"').unwrap());    
+                    ytapp.ImeDatoteke = sporocilo;
                 }
                 else if sporocilo.contains(" has already been downloaded"){
                     ytapp.CPPrenosEvent.kliknjen = false;
