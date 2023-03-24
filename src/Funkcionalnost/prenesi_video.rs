@@ -120,7 +120,7 @@ pub fn Prenesi_Video(ytapp: &mut YTApp){
                                                         let podatek_string = String::from_utf8_lossy(&podatek).to_string();
                                                         
                                                         //Preveri če je prenos z števili                                                    
-                                                        let regex = Regex::new(r":\d\d$").unwrap();
+                                                        let regex = Regex::new(r":\d\d$| \(frag.*\d\)$").unwrap();
 
                                                         
                                                         if regex.is_match(&podatek_string){
@@ -138,7 +138,7 @@ pub fn Prenesi_Video(ytapp: &mut YTApp){
                                                                 }
         
                                                                 //Dobi vse zadnje besede (hitrost in cas)
-                                                                if counter > 5 {
+                                                                if counter > 6 && counter < 10 {
                                                                     cas.push_str(beseda);
                                                                     cas.push(' ');
                                                                 }
