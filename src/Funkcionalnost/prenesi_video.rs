@@ -120,11 +120,12 @@ pub fn Prenesi_Video(ytapp: &mut YTApp){
                                                         let podatek_string = String::from_utf8_lossy(&podatek).to_string();
                                                         
                                                         //Preveri če je prenos z števili                                                    
-                                                        let regex = Regex::new(r":\d\d$| \(frag.*\d\)$").unwrap();
-
+                                                        let regex = Regex::new(r":\d\d$").unwrap();
+                                                        let regex_frag = Regex::new(r"\(frag.*\d\)$").unwrap();
+                                                        
                                                         
                                                         if regex.is_match(&podatek_string){
-
+                                                            println!("{}", podatek_string);
                                                             let mut counter = 0;
                                                             let mut procent = String::new();
                                                             let mut cas = String::new();
@@ -147,6 +148,28 @@ pub fn Prenesi_Video(ytapp: &mut YTApp){
                                                             sporocilo.push_str(format!("[prenos]{}|{}", procent, cas).as_str());
                                                             
                                                             
+                                                        }
+                                                        else if regex_frag.is_match(&podatek_string){
+                                                            let mut counter = 0;
+                                                            let mut procent = String::new();
+                                                            let mut cas = String::new();
+
+                                                            for beseda in podatek_string.split_whitespace(){
+                                                                counter += 1;
+        
+                                                                //Dobi drugo besedo iz tega stringa (ostanek)
+                                                                if counter == 2 {
+                                                                    procent = beseda.to_string();
+                                                                    break;
+                                                                }
+                                                            }
+
+                                                            let at_pos = podatek_string.find(" at ").unwrap_or_default();
+                                                            let frag_pos = podatek_string.find("(frag").unwrap_or(podatek_string.len());
+
+                                                            cas.push_str(&podatek_string[at_pos+4..frag_pos]);
+        
+                                                            sporocilo.push_str(format!("[prenos]{}|{}", procent, cas).as_str());                                                            
                                                         }
                                                         else{
                                                             sporocilo.push_str(&podatek_string);
