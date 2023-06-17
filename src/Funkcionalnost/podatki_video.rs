@@ -8,6 +8,7 @@ use std::os::windows::process::CommandExt;
 use serde_json::Value;
 
 use super::skupno::Pretvori_Non_Ascii;
+use super::skupno::Odstrani_Nedovljene_Znake;
 
 
 const CREATE_NO_WINDOW: u32 = 0x08000000;
@@ -155,7 +156,7 @@ pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp){
                 }
 
                 //Dobi ime kanala v ascii obliki
-                ytapp.YTKanal = Pretvori_Non_Ascii(v["channel"].to_string());
+                ytapp.YTKanal = Odstrani_Nedovljene_Znake(Pretvori_Non_Ascii(v["channel"].to_string()));
         
                 //Dobi tage ter pregleda, če je kakšen enak kategoriji
                 if let Some(tags) = v["tags"].as_array(){

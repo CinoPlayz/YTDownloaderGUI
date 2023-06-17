@@ -191,3 +191,23 @@ pub fn Pretvori_Non_Ascii(string: String) -> String{
 
 }
 
+
+pub fn Odstrani_Nedovljene_Znake(string: String) -> String{
+    let mut legal_string: String = String::new();
+
+    for znak in string.chars(){
+        //println!("{}", znak);
+        match znak {
+            '\'' | '/' | '\\' => (),           
+            _ => legal_string.push(znak)
+        }        
+    }
+
+    if legal_string.is_empty(){
+        legal_string = "Neznano".to_string();
+    }
+
+    return  legal_string;
+
+}
+
