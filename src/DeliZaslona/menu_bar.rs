@@ -1,5 +1,4 @@
 use egui::{Context, Ui};
-use eframe::Frame;
 use egui::global_theme_preference_switch;
 
 use crate::app::YTApp;

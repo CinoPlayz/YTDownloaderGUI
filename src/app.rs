@@ -1,7 +1,4 @@
-
-use egui::FontFamily::Proportional;
-use egui::FontId;
-use egui::TextStyle::*;
+use std::collections::BTreeMap;
 use std::sync::mpsc;
 use std::sync::mpsc::Receiver;
 
@@ -11,7 +8,9 @@ use crate::structs::PrejetoEvent;
 use crate::structs::Format;
 use crate::Funkcionalnost::skupno::nalozi_sliko_napaka;
 use crate::Funkcionalnost::skupno::nalozi_verzijo;
-
+use egui::TextStyle;
+use egui::Theme;
+use egui::{ FontFamily::Proportional, FontId, TextStyle::*};
 
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)]
@@ -166,12 +165,9 @@ impl Default for YTApp {
     }
 }
 
-pub fn setup_custom_text_style(ctx: &egui::Context) {
-    // Get current context style
-    let mut style = (*ctx.style()).clone();
-
+fn setup_custom_text_style(ctx: &egui::Context) {
     // Redefine text_styles
-    style.text_styles = [
+    let text_styles: BTreeMap<TextStyle, FontId> = [
     (Heading, FontId::new(30.0, Proportional)),
     (Name("Heading2".into()), FontId::new(25.0, Proportional)),
     (Name("Context".into()), FontId::new(10.0, Proportional)),
@@ -183,14 +179,33 @@ pub fn setup_custom_text_style(ctx: &egui::Context) {
     ].into();
 
     // Mutate global style with above changes
-    ctx.set_style(style);
+    ctx.all_styles_mut(move |style| style.text_styles = text_styles.clone());
+}
+
+fn setup_default_theme(ctx: &egui::Context){
+    //Dobi themo računalnika
+    let mode = dark_light::detect();
+    let thema;
+
+    match mode {
+        dark_light::Mode::Dark => {
+            thema = Theme::Dark;
+        }
+        dark_light::Mode::Light => {
+            thema = Theme::Light;
+        }
+        dark_light::Mode::Default => {
+            thema = Theme::Dark;
+        }        
+    }    
+    ctx.set_theme(thema);
 }
 
 impl YTApp {
     /// Called once before the first frame.
     pub fn new(cc: &eframe::CreationContext<'_>) -> Self {
-
         setup_custom_text_style(&cc.egui_ctx);
+        setup_default_theme(&cc.egui_ctx);
         // This is also where you can customized the look at feel of egui using
         // `cc.egui_ctx.set_visuals` and `cc.egui_ctx.set_fonts`.
 
@@ -214,7 +229,7 @@ impl eframe::App for YTApp {
         eframe::set_value(storage, eframe::APP_KEY, self);
     }
 
-    fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {  
+    fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {  
         //Naloži sliko za napako in verzijo (samo enkrat)   
         nalozi_sliko_napaka(self, ctx);
         nalozi_verzijo(self);

@@ -8,26 +8,9 @@ mod structs;
 
 use eframe::egui;
 use app::YTApp;
-use eframe::egui::{ Style, Visuals };
 use egui::{ IconData, Vec2, ViewportBuilder };
 
 fn main() {
-    //Dobi themo računalnika
-    let mode = dark_light::detect();
-    let thema;
-
-    match mode {
-        dark_light::Mode::Dark => {
-            thema = Visuals::dark();
-        }
-        dark_light::Mode::Light => {
-            thema = Visuals::light();
-        }
-        dark_light::Mode::Default => {
-            thema = Visuals::dark();
-        }
-    }
-
     tracing_subscriber::fmt::init();
 
     //Window options
@@ -36,7 +19,7 @@ fn main() {
             icon: Some(load_icon("assets/icon/icon-red.png").into()),
             min_inner_size: Some(Vec2 { x: 500.0, y: 620.0 }),
             ..Default::default()
-        },
+        },        
         ..Default::default()
     };
 
@@ -46,13 +29,7 @@ fn main() {
         eframe::run_native(
             "YT Downloader",
             options,
-            Box::new(|creation_context| {
-                let style = Style {
-                    //Spremeni themo gleda themo računalnika
-                    visuals: thema,
-                    ..Style::default()
-                };
-                creation_context.egui_ctx.set_style(style);
+            Box::new(|creation_context| {               
                 Ok(Box::new(YTApp::new(creation_context)))
             })
         )
