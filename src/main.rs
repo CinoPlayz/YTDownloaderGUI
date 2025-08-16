@@ -8,7 +8,8 @@ mod structs;
 
 use eframe::egui;
 use app::YTApp;
-use eframe::egui::{Style, Visuals};
+use eframe::egui::{ Style, Visuals };
+use egui::{ IconData, Vec2, ViewportBuilder };
 
 fn main() {
     //Dobi themo računalnika
@@ -16,58 +17,62 @@ fn main() {
     let thema;
 
     match mode {
-        dark_light::Mode::Dark => {thema = Visuals::dark()},
-        dark_light::Mode::Light => {thema = Visuals::light()},
-        dark_light::Mode::Default => {thema = Visuals::dark()},
+        dark_light::Mode::Dark => {
+            thema = Visuals::dark();
+        }
+        dark_light::Mode::Light => {
+            thema = Visuals::light();
+        }
+        dark_light::Mode::Default => {
+            thema = Visuals::dark();
+        }
     }
-    
+
     tracing_subscriber::fmt::init();
 
     //Window options
     let options = eframe::NativeOptions {
-        icon_data: Some(load_icon("assets/icon/icon-red.png")), 
-        initial_window_size: Some(egui::Vec2::new(500.0, 620.0)),
-        min_window_size: Some(egui::Vec2::new(500.0, 620.0)),
+        viewport: ViewportBuilder {
+            icon: Some(load_icon("assets/icon/icon-red.png").into()),
+            min_inner_size: Some(Vec2 { x: 500.0, y: 620.0 }),
+            ..Default::default()
+        },
         ..Default::default()
     };
-    
+
     let _native_options = eframe::NativeOptions::default();
-    
-    match eframe::run_native(
-        "YT Downloader",
-        options,
-        Box::new(|creation_context| {
-            let style = Style {
-                //Spremeni themo gleda themo računalnika
-                visuals: thema,
-                ..Style::default()
-            };
-            creation_context.egui_ctx.set_style(style);
-            Box::new(YTApp::new(creation_context))
-        }),
-    ){
-        Ok(_) => {},
+
+    match
+        eframe::run_native(
+            "YT Downloader",
+            options,
+            Box::new(|creation_context| {
+                let style = Style {
+                    //Spremeni themo gleda themo računalnika
+                    visuals: thema,
+                    ..Style::default()
+                };
+                creation_context.egui_ctx.set_style(style);
+                Ok(Box::new(YTApp::new(creation_context)))
+            })
+        )
+    {
+        Ok(_) => {}
         Err(napaka) => println!("Napaka pri zagonu: {}", napaka),
     }
 
-    fn load_icon(path: &str) -> eframe::IconData {
+    fn load_icon(path: &str) -> IconData {
         let (icon_rgba, icon_width, icon_height) = {
-            let image = image::open(path)
-            .expect("Ne morem odpreti icone")
-            .into_rgba8();
+            let image = image::open(path).expect("Ne morem odpreti icone").into_rgba8();
             let (width, height) = image.dimensions();
             let rgba = image.into_raw();
             (rgba, width, height)
-    
-    
         };
-    
-        eframe::IconData {
+
+        IconData {
             rgba: icon_rgba,
             width: icon_width,
             height: icon_height,
         }
     }
-
 }
-

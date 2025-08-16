@@ -166,7 +166,7 @@ impl Default for YTApp {
     }
 }
 
-fn setup_custom_text_style(ctx: &egui::Context) {
+pub fn setup_custom_text_style(ctx: &egui::Context) {
     // Get current context style
     let mut style = (*ctx.style()).clone();
 
@@ -223,11 +223,10 @@ impl eframe::App for YTApp {
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             
             //Doda menubar
-            egui::menu::bar(ui, |ui| {
+            egui::MenuBar::new().ui(ui, |ui| {
 
                 //Doda izgled in funkcionalnost temu menu baru
-                DeliZaslona::menu_bar::DodajIzgled(self, ui, frame);                
-                
+                DeliZaslona::menu_bar::DodajIzgled(self, ui, ctx); 
             });
         });
 

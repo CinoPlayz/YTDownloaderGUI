@@ -1,14 +1,14 @@
 [package]
 name = "YTDownloaderGUI"
-version = "1.0.6"
+version = "1.1.0"
 edition = "2021"
 build = "build.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-egui = "0.22.0"
-eframe = { version = "0.22.0", features = ["persistence"] }
+egui = "0.32.0"
+eframe = { version = "0.32.0", features = ["persistence"] }
 tracing-subscriber = "0.3"
 serde = { version = "1", features = ["derive"] } # App persistence
 image = "0.24"
@@ -19,3 +19,4 @@ regex = "1"
 
 [target.'cfg(windows)'.build-dependencies]
 winres = "0.1"
+

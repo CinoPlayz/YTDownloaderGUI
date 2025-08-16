@@ -1,44 +1,44 @@
-use serde::{Deserialize, Serialize};
-pub struct GumbEvent{
+use serde::{ Deserialize, Serialize };
+pub struct GumbEvent {
     pub kliknjen: bool,
 }
 
-pub struct PrejetoEvent{
+pub struct PrejetoEvent {
     pub aktivno: bool,
     pub napaka: bool,
     pub sporocilo: String,
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct Kategorije{
+pub struct Kategorije {
     pub Kategorije: Vec<String>,
 }
 
-impl Default for PrejetoEvent{
+impl Default for PrejetoEvent {
     fn default() -> Self {
-        PrejetoEvent { 
-            aktivno: false, 
+        PrejetoEvent {
+            aktivno: false,
             napaka: false,
-            sporocilo: "".to_string()
+            sporocilo: "".to_string(),
         }
     }
 }
 
-#[derive(PartialEq, Clone)] 
-pub struct Format{
+#[derive(PartialEq, Clone)]
+pub struct Format {
     pub ID: String,
-    pub VideoFormat: String,    
+    pub VideoFormat: String,
     pub Rezolucija: String,
     pub ExtFormat: String,
 }
 
-impl Default for Format{
+impl Default for Format {
     fn default() -> Self {
-        Format { 
-            ID: "".to_string(), 
-            VideoFormat: "".to_string(), 
+        Format {
+            ID: "".to_string(),
+            VideoFormat: "".to_string(),
             Rezolucija: "".to_string(),
-            ExtFormat: "".to_string()
+            ExtFormat: "".to_string(),
         }
     }
 }

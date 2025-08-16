@@ -64,7 +64,7 @@ pub fn IzpisiNapako(ytapp: &mut YTApp, ctx: &egui::Context, ID: u16, napaka: Str
 
         //Postavi v grid zato da sta v eni vrstici
         egui::Grid::new("586013").show(ui, |ui| {
-            ui.image(texture, texture.size_vec2());
+            ui.image(texture);
             ui.label(egui::RichText::new(napaka_multi_line));
             ui.end_row();
         });
