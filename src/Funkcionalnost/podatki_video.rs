@@ -140,7 +140,7 @@ pub fn PridobiPodatkeOdVideja(ytapp: &mut YTApp){
                     for format in formats{
 
                         //Preveri da je tak format, kjer je videjo in nič audia
-                        if format["video_ext"] != "none" && format["audio_ext"] == "none" {
+                        if format["video_ext"] != "none" && format["audio_ext"] == "none" && format["language"].is_null() {
                             let id = format["format_id"].to_string().replace("\"", "");
                             let mut video_format = format["vcodec"].to_string().replace("\"", "");
                             let rezolucija = format["resolution"].to_string().replace("\"", "");
