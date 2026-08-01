@@ -53,8 +53,8 @@ pub fn Prenesi_Audio(ytapp: &mut YTApp){
                         //Preveri če lahko ta tip podpira thumbnaile
                         if IzbranaVrsta == "mp3" || IzbranaVrsta == "m4a"{
                             result_otrok = Command::new("powershell")
-                            .args([r".\yt-dlp.exe", "-f", "ba", "-x --audio-format", &IzbranaVrsta,  "-P", &PotDoAudio, &URL, "--embed-thumbnail", "--restrict-filenames"])
-                            .creation_flags(CREATE_NO_WINDOW)
+                            .args([r".\yt-dlp.exe", "-f", "ba", "-x --audio-format", &IzbranaVrsta,  "-P", &PotDoAudio, &URL, "--embed-thumbnail", "--restrict-filenames", "--add-metadata", "--embed-thumbnail"])
+                            .creatioWn_flags(CREATE_NO_WINDOW)
                             .stdout(Stdio::piped())
                             .stderr(Stdio::piped())
                             .spawn();
